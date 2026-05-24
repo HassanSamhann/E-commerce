@@ -1,23 +1,18 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "src/server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "node_modules/.prisma/client/schema.prisma",
-          "node_modules/.prisma/client/query-engine-*",
-          "../../node_modules/.prisma/client/schema.prisma",
-          "../../node_modules/.prisma/client/query-engine-*"
-        ]
-      }
+  "functions": {
+    "src/server.ts": {
+      "includeFiles": [
+        "node_modules/.prisma/client/schema.prisma",
+        "node_modules/.prisma/client/query-engine-*",
+        "../../node_modules/.prisma/client/schema.prisma",
+        "../../node_modules/.prisma/client/query-engine-*"
+      ]
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "src/server.ts"
+      "source": "/(.*)",
+      "destination": "/src/server.ts"
     }
   ]
 }
