@@ -53,13 +53,52 @@ export default function StorefrontProductDetailsPage() {
   const product = productData;
   const isLoading = isStoreLoading || isProductLoading;
 
-  if (isLoading) {
+  if (isLoading || !store) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-500" />
-        <p className="text-sm font-medium text-slate-400 mt-2">
-          {isRtl ? "جاري تحميل تفاصيل المنتج..." : "Loading product details..."}
-        </p>
+      <div className="space-y-8 animate-pulse" dir={isRtl ? "rtl" : "ltr"}>
+        {/* Breadcrumb Navigation Shimmer */}
+        <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left Column: Image Shimmer */}
+          <div className="lg:col-span-6 space-y-4">
+            <div className="rounded-[28px] aspect-square bg-slate-200 dark:bg-slate-800 border border-slate-100 dark:border-slate-800/80 shadow-sm" />
+            <div className="flex gap-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="w-20 h-20 rounded-xl bg-slate-200 dark:bg-slate-800 flex-shrink-0" />
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Meta Shimmer */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="space-y-2">
+              <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+              <div className="h-9 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+            </div>
+
+            {/* Price box Shimmer */}
+            <div className="h-16 w-1/2 bg-slate-200 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800/60" />
+
+            {/* Description Shimmer */}
+            <div className="space-y-2">
+              <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+              <div className="h-32 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+            </div>
+
+            {/* Actions Shimmer */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="h-14 flex-1 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+                <div className="h-14 flex-1 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
