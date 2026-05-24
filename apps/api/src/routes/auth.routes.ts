@@ -79,7 +79,7 @@ router.post(
 
       res.json({
         user: { id: user.id, name: user.name, email: user.email },
-        tenants: members.map((m) => ({
+        tenants: members.map((m: any) => ({
           id: m.tenant.id,
           name: m.tenant.name,
           slug: m.tenant.slug,

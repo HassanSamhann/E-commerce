@@ -133,7 +133,7 @@ router.post("/:slug/orders", async (req: Request, res: Response, next: NextFunct
 
     let subtotal = 0;
     const orderItems = items.map((item: { productId: string; quantity: number; variantId?: string }) => {
-      const product = products.find((p) => p.id === item.productId);
+      const product = products.find((p: any) => p.id === item.productId);
       if (!product) throw new Error(`Product ${item.productId} not found`);
       const itemTotal = Number(product.price) * item.quantity;
       subtotal += itemTotal;

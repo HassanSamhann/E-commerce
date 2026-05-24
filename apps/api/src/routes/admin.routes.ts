@@ -83,7 +83,7 @@ router.post(
         orderBy: { sortOrder: "asc" },
       });
 
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx: any) => {
         // Create user if not exists
         if (!user) {
           user = await tx.user.create({

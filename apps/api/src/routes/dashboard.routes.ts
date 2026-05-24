@@ -118,15 +118,15 @@ router.get("/", async (req: AuthRequest, res: Response, next: NextFunction) => {
     ]);
 
     // Get product names for top products
-    const topProductIds = topProducts.map((p) => p.productId);
+    const topProductIds = topProducts.map((p: any) => p.productId);
     const productNames = await prisma.product.findMany({
       where: { id: { in: topProductIds } },
       select: { id: true, name: true, images: { take: 1 } },
     });
 
-    const topProductsWithNames = topProducts.map((tp) => ({
+    const topProductsWithNames = topProducts.map((tp: any) => ({
       ...tp,
-      product: productNames.find((p) => p.id === tp.productId),
+      product: productNames.find((p: any) => p.id === tp.productId),
     }));
 
     // Build daily revenue chart (last 30 days)
