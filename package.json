@@ -14,7 +14,8 @@
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate",
     "db:studio": "turbo run db:studio",
-    "db:seed": "turbo run db:seed"
+    "db:seed": "turbo run db:seed",
+    "postinstall": "npm run build --workspace=@repo/database"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
