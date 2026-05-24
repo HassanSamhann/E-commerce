@@ -29,4 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <Toaster />
           </AuthProvider>
         </LanguageProvider>
-      </QueryClientProvider
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
+}
