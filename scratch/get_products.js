@@ -7,7 +7,7 @@ async function main() {
     include: {
       images: true,
     },
-  });
+  }); 
   console.log("=== Products in DB ===");
   console.log(JSON.stringify(products, null, 2));
 }
