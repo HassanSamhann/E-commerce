@@ -1,12 +1,7 @@
 {
   "functions": {
     "src/server.ts": {
-      "includeFiles": [
-        "node_modules/.prisma/client/schema.prisma",
-        "node_modules/.prisma/client/query-engine-*",
-        "../../node_modules/.prisma/client/schema.prisma",
-        "../../node_modules/.prisma/client/query-engine-*"
-      ]
+      "includeFiles": "**/node_modules/.prisma/client/**"
     }
   },
   "rewrites": [
