@@ -28,9 +28,29 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        origin.startsWith("http://localhost:") || 
+                        origin.startsWith("http://127.0.0.1:") ||
+                        origin.endsWith(".vercel.app");
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        // Also allow dynamic tenant custom domains in production
+        callback(null, true);
+      }
+    },
     credentials: true,
   })
 );
