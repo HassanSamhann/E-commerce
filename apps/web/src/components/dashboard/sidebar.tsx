@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import {
   ShoppingBag,
   LayoutDashboard,
@@ -22,6 +23,7 @@ import { useAuth } from "@/contexts/auth.context";
 import { useLanguage } from "@/contexts/language.context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { api } from "@/lib/api";
 
 const navItems = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -45,6 +47,17 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const isSuperAdmin = user?.email === "demo@shop.com";
+
+  // Fetch badge counts from dashboard
+  const { data: dashData } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => api.get("/api/dashboard").then((r) => r.data),
+    staleTime: 60_000,
+    enabled: !!currentTenant,
+  });
+
+  const pendingCount: number = dashData?.stats?.pendingOrdersCount ?? 0;
+  const lowStockCount: number = dashData?.stats?.lowStockCount ?? 0;
 
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === href : pathname.startsWith(href);
@@ -108,6 +121,19 @@ export function Sidebar() {
           const Icon = item.icon;
           const active = isActive(item.href);
           const labelText = t(item.key);
+
+          // Badge count for specific routes
+          const badge =
+            item.href === "/dashboard/orders" && pendingCount > 0
+              ? pendingCount
+              : item.href === "/dashboard/products" && lowStockCount > 0
+              ? lowStockCount
+              : null;
+          const badgeColor =
+            item.href === "/dashboard/products"
+              ? "bg-red-500"
+              : "bg-amber-500";
+
           return (
             <Link
               key={item.href}
@@ -119,8 +145,20 @@ export function Sidebar() {
               )}
               title={collapsed ? labelText : undefined}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              {!collapsed && <span>{labelText}</span>}
+              <div className="relative flex-shrink-0">
+                <Icon className="w-5 h-5" />
+                {badge !== null && (
+                  <span className={`absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 rounded-full ${badgeColor} text-white text-[9px] font-black flex items-center justify-center leading-none`}>
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                )}
+              </div>
+              {!collapsed && <span className="flex-1">{labelText}</span>}
+              {!collapsed && badge !== null && (
+                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full text-white ${badgeColor}`}>
+                  {badge > 99 ? "99+" : badge}
+                </span>
+              )}
               {active && !collapsed && (
                 <motion.div
                   layoutId="active-indicator"

@@ -141,6 +141,21 @@
   @apply bg-slate-400 dark:bg-slate-500;
 }
 
+/* Smooth theme transition — applied globally so dark/light feels instant but polished */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Exception: don't animate transforms and opacity with theme changes (would slow animations) */
+.no-theme-transition,
+.no-theme-transition * {
+  transition: none !important;
+}
+
 /* Shimmer loading */
 .shimmer {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -151,4 +166,14 @@
 .dark .shimmer {
   background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
   background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Focus ring */
+:focus-visible {
+  @apply outline-none ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-slate-900;
 }
