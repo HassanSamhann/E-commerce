@@ -26,7 +26,9 @@ import {
   User,
   LayoutGrid,
   Info,
-  PhoneCall
+  PhoneCall,
+  Sun,
+  Moon
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { CartProvider, useCart } from "@/contexts/cart.context";
@@ -35,12 +37,19 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/language.context";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useTheme } from "next-themes";
 
-function StorefrontNavbar({ store }: { store: any }) {
+function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; isCartOpen: boolean; setIsCartOpen: (open: boolean) => void }) {
   const { cartCount, cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [activeParentCat, setActiveParentCat] = useState<any>(null);
+  
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const router = useRouter();
   const params = useParams();
@@ -97,7 +106,7 @@ function StorefrontNavbar({ store }: { store: any }) {
       </div>
 
       {/* 2. Main Header (Logo, Big Search, User Actions, Shipping Badge) */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-colors shadow-sm py-3">
+      <header className="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-100 dark:border-slate-800/80 transition-colors shadow-sm py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             
@@ -126,6 +135,10 @@ function StorefrontNavbar({ store }: { store: any }) {
 
               {/* Ship to Egypt Badge */}
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-750 text-xs font-bold text-slate-650 dark:text-slate-350">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
                 <MapPin className="w-3.5 h-3.5 text-slate-400" />
                 <span>{isRtl ? "شحن إلى مصر" : "Ship to Egypt"}</span>
                 <span className="w-4 h-3 bg-red-650 inline-block relative ml-0.5 rounded-sm">🇪🇬</span>
@@ -156,6 +169,21 @@ function StorefrontNavbar({ store }: { store: any }) {
             {/* Right Container: Wishlist, Cart & Switcher */}
             <div className="flex items-center justify-end gap-3.5 flex-shrink-0">
               <LanguageSwitcher />
+
+              {/* Theme Toggle Button */}
+              {mounted && (
+                <button
+                  onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                  className="p-2.5 rounded-xl text-slate-550 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-all focus:outline-none"
+                  title={resolvedTheme === "dark" ? "وضع النهار" : "الوضع الليلي"}
+                >
+                  {resolvedTheme === "dark" ? (
+                    <Sun className="w-5 h-5 text-amber-500 transition-transform duration-500 hover:rotate-45" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-indigo-400 transition-transform duration-500 hover:-rotate-12" />
+                  )}
+                </button>
+              )}
 
               {/* Wishlist Placeholder */}
               <button className="p-2.5 rounded-xl text-slate-500 hover:text-red-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
@@ -475,6 +503,27 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
   const { slug } = params as { slug: string };
   const { language } = useLanguage();
   const isRtl = language === "ar";
+  const { cartCount } = useCart();
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cleanPhoneForWhatsapp = (phoneString: string) => {
+    if (!phoneString) return "";
+    const cleaned = phoneString.replace(/\D/g, ""); // Keep only numbers
+    if (cleaned.startsWith("0")) {
+      return "2" + cleaned;
+    }
+    if (cleaned.startsWith("20")) {
+      return cleaned;
+    }
+    return "20" + cleaned;
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["store", slug],
@@ -518,8 +567,8 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-slate-950 transition-colors">
-      <StorefrontNavbar store={data} />
+    <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-slate-950 transition-colors pb-16 sm:pb-0">
+      <StorefrontNavbar store={data} isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {React.cloneElement(children as React.ReactElement, { store: data })}
       </main>
@@ -607,11 +656,113 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
 
           </div>
 
+          {/* Trust and Payment Badges */}
+          <div className="flex flex-wrap justify-center items-center gap-6 py-6 border-t border-slate-100 dark:border-slate-800/80 mb-6">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-850/50 border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-550 dark:text-slate-400 shadow-sm">
+              <span className="text-emerald-500 text-base">💵</span>
+              <span>{isRtl ? "الدفع عند الاستلام كاش" : "Cash on Delivery"}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-850/50 border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-550 dark:text-slate-400 shadow-sm">
+              <span className="text-blue-500 text-base">⚡</span>
+              <span>{isRtl ? "شحن سريع وآمن" : "Fast & Secure Shipping"}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-850/50 border border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-550 dark:text-slate-400 shadow-sm">
+              <span className="text-indigo-500 text-base">🔒</span>
+              <span>{isRtl ? "حماية وضمان الجودة" : "Quality Guarantee"}</span>
+            </div>
+            
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden md:block" />
+            
+            <div className="flex items-center gap-3">
+              <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" className="h-7 w-auto opacity-75 dark:opacity-90 hover:opacity-100 hover:scale-105 transition-all" />
+              <img src="https://img.icons8.com/color/48/mastercard.png" alt="Mastercard" className="h-7 w-auto opacity-75 dark:opacity-90 hover:opacity-100 hover:scale-105 transition-all" />
+              <div className="px-2 py-1 rounded bg-red-650 text-white font-extrabold text-[9px] uppercase tracking-wider scale-90 select-none shadow-sm shadow-red-500/20">
+                COD
+              </div>
+              <div className="px-2 py-1 rounded bg-emerald-650 text-white font-extrabold text-[9px] uppercase tracking-wider scale-90 select-none shadow-sm shadow-emerald-500/20">
+                V-CASH
+              </div>
+            </div>
+          </div>
+
           <div className="pt-8 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-400 font-medium">
-            <p>© {new Date().getFullYear()} {data.name}. {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."} Powered by SaaS E-Commerce.</p>
+            <p className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+              <span>© {new Date().getFullYear()} {data.name}. {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."}</span>
+              <span className="hidden sm:inline text-slate-350 dark:text-slate-700">|</span>
+              <span className="flex items-center gap-1">
+                {isRtl ? "مشغل بواسطة" : "Powered by"}{" "}
+                <a 
+                  href="https://github.com/HassanSamhann" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="font-black hover:scale-105 transition-transform duration-200 bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent"
+                >
+                  H.samhan
+                </a>
+              </span>
+            </p>
           </div>
         </div>
       </footer>
+
+      {/* 4. Mobile Bottom Floating Sticky Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-150 dark:border-slate-850 px-6 py-2.5 flex items-center justify-between sm:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.06)] transition-all">
+        {/* Home */}
+        <Link 
+          href={`/store/${slug}`}
+          className="flex flex-col items-center gap-1 text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all duration-200"
+        >
+          <Store className="w-5 h-5" />
+          <span className="text-[10px] font-black">{isRtl ? "الرئيسية" : "Home"}</span>
+        </Link>
+
+        {/* Cart trigger */}
+        <button 
+          onClick={() => setIsCartOpen(true)}
+          className="relative flex flex-col items-center gap-1 text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all duration-200 focus:outline-none"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          {cartCount > 0 && (
+            <span
+              className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 text-[9px] font-black text-white rounded-full flex items-center justify-center animate-bounce shadow-sm"
+              style={{ backgroundColor: data.primaryColor || taagerTeal }}
+            >
+              {cartCount}
+            </span>
+          )}
+          <span className="text-[10px] font-black">{isRtl ? "السلة" : "Cart"}</span>
+        </button>
+
+        {/* Theme switcher */}
+        {mounted && (
+          <button 
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            className="flex flex-col items-center gap-1 text-slate-550 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all duration-200 focus:outline-none"
+          >
+            {resolvedTheme === "dark" ? (
+              <Sun className="w-5 h-5 text-amber-500 transition-transform duration-500 hover:rotate-45" />
+            ) : (
+              <Moon className="w-5 h-5 text-indigo-400" />
+            )}
+            <span className="text-[10px] font-black">{isRtl ? "المظهر" : "Theme"}</span>
+          </button>
+        )}
+
+        {/* WhatsApp direct support */}
+        {data.phone && (
+          <a 
+            href={`https://wa.me/${cleanPhoneForWhatsapp(data.phone)}?text=${encodeURIComponent(isRtl ? "مرحباً، أود الاستفسار عن بعض المنتجات." : "Hello, I want to ask about some products.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1 text-slate-555 hover:text-emerald-500 dark:text-slate-400 dark:hover:text-emerald-450 transition-all duration-200"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-emerald-500 dark:text-emerald-400">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 1.981 14.113.975 11.488.975c-5.442 0-9.866 4.372-9.87 9.802 0 1.698.48 3.35 1.387 4.825L1.97 21.03l5.677-1.876zm13.125-9.351c-.322-.16-.1.21-.83-.16-.403-.201-2.39-1.177-2.761-1.31-.37-.134-.64-.201-.91.201-.27.402-1.042 1.31-1.277 1.578-.235.268-.47.301-.79.141-.322-.16-1.362-.501-2.594-1.599-.958-.853-1.602-1.908-1.79-2.22-.19-.311-.02-.48.14-.64.14-.14.32-.37.48-.56.16-.18.21-.31.32-.51.11-.2.05-.38-.03-.54-.08-.16-.91-2.206-1.246-3.009-.329-.787-.663-.681-.912-.693-.235-.011-.504-.014-.772-.014-.27 0-.71.1-1.08.5-.37.4-1.41 1.38-1.41 3.367s1.44 3.9 1.64 4.168c.2.268 2.83 4.302 6.85 6.043 4.02 1.741 4.02 1.16 4.75 1.08.73-.08 2.39-.974 2.72-1.916.33-.942.33-1.751.23-1.918-.1-.168-.37-.268-.69-.428z" />
+            </svg>
+            <span className="text-[10px] font-black">{isRtl ? "دعم" : "Support"}</span>
+          </a>
+        )}
+      </div>
     </div>
   );
 }

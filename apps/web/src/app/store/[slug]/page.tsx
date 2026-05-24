@@ -311,21 +311,21 @@ export default function StorefrontPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group bg-white dark:bg-slate-900 border border-slate-100/80 dark:border-slate-800 rounded-3xl overflow-hidden p-4 flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative shadow-sm"
+                    className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 rounded-[24px] overflow-hidden p-4 flex flex-col justify-between shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 transition-all duration-300 relative"
                   >
                     {/* Link to details page wrapping Image & Metadata */}
                     <Link href={`/store/${slug}/products/${product.id}`} className="flex-1 flex flex-col group cursor-pointer">
                       
                       {/* Image / Gallery */}
-                      <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800/30 mb-4 border border-slate-50 dark:border-slate-850">
+                      <div className="relative h-52 w-full rounded-[18px] overflow-hidden bg-slate-50 dark:bg-slate-800/40 mb-4 border border-slate-50 dark:border-slate-850">
                         {product.images?.[0]?.url ? (
                           <img
                             src={product.images[0].url}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-slate-300">
+                          <div className="w-full h-full flex items-center justify-center text-slate-355 bg-slate-50 dark:bg-slate-800/50">
                             <Package className="w-12 h-12 stroke-[1.25]" />
                           </div>
                         )}
@@ -333,13 +333,13 @@ export default function StorefrontPage() {
                         {/* Featured & Discount Badges */}
                         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
                           {discountPercent > 0 && (
-                            <span className="bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md">
+                            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-red-500/20">
                               {language === "ar" ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`}
                             </span>
                           )}
                           {product.isFeatured && (
                             <span
-                              className="text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md"
+                              className="text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-indigo-500/20"
                               style={{ backgroundColor: store.primaryColor || taagerTeal }}
                             >
                               {t("featured")}
@@ -349,8 +349,8 @@ export default function StorefrontPage() {
 
                         {/* Stock badge */}
                         {outOfStock && (
-                          <div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[1px] flex items-center justify-center z-10">
-                            <span className="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg">
+                          <div className="absolute inset-0 bg-white/75 dark:bg-slate-900/75 backdrop-blur-[2px] flex items-center justify-center z-10">
+                            <span className="bg-slate-900 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-lg border border-white/10">
                               {t("outOfStock")}
                             </span>
                           </div>
@@ -360,15 +360,15 @@ export default function StorefrontPage() {
                       {/* Metadata */}
                       <div className="flex-1 flex flex-col px-1.5">
                         {product.category && (
-                          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 block">
+                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">
                             {product.category.name}
                           </span>
                         )}
-                        <h3 className="text-sm font-extrabold text-slate-850 dark:text-white line-clamp-1 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors leading-snug">
+                        <h3 className="text-sm font-extrabold text-slate-850 dark:text-white line-clamp-1 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-snug">
                           {product.name}
                         </h3>
                         {product.description && (
-                          <p className="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-400 dark:text-slate-450 mt-1.5 line-clamp-2 leading-relaxed">
                             {product.description}
                           </p>
                         )}
@@ -376,10 +376,10 @@ export default function StorefrontPage() {
                     </Link>
 
                     {/* Pricing and CTA */}
-                    <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-850 flex items-center justify-between px-1.5">
+                    <div className="mt-4 pt-4 border-t border-slate-55 dark:border-slate-855 flex items-center justify-between px-1.5">
                       <div>
                         {hasDiscount && (
-                          <span className="text-[11px] font-bold text-slate-400 line-through block mb-0.5">
+                          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 line-through block mb-0.5">
                             {formatCurrency(Number(product.comparePrice), store.currency)}
                           </span>
                         )}
@@ -390,9 +390,13 @@ export default function StorefrontPage() {
 
                       <button
                         disabled={outOfStock}
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
                         className={cn(
-                          "px-4 py-2 rounded-xl text-white text-xs font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center gap-1 hover:opacity-95"
+                          "px-4.5 py-2 rounded-xl text-white text-xs font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center gap-1 hover:scale-105 active:scale-95"
                         )}
                         style={{
                           backgroundColor: outOfStock

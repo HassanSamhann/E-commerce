@@ -234,6 +234,12 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-6">
+      <style>{`
+        .dynamic-focus-input:focus {
+          border-color: ${store.primaryColor || "#6366f1"} !important;
+          box-shadow: 0 0 0 2px ${(store.primaryColor || "#6366f1")}20 !important;
+        }
+      `}</style>
       {/* Back button */}
       <div>
         <Link
@@ -252,10 +258,10 @@ export default function CheckoutPage() {
         <div className="lg:col-span-7">
           <form
             onSubmit={handleCheckoutSubmit}
-            className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
+            className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
           >
             <div className="space-y-4">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>1</span>
                 {t("contactInfo")}
               </h2>
@@ -269,7 +275,7 @@ export default function CheckoutPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder={t("fullNamePlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm animate-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm animate-none"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -281,7 +287,7 @@ export default function CheckoutPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder={t("phoneNumberPlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                   />
                 </div>
               </div>
@@ -294,13 +300,13 @@ export default function CheckoutPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder={t("emailAddressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
             </div>
 
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>2</span>
                 {t("shippingAddress")}
               </h2>
@@ -313,7 +319,7 @@ export default function CheckoutPage() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder={t("addressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -323,7 +329,7 @@ export default function CheckoutPage() {
                     name="city"
                     value={selectedGov.nameEn}
                     onChange={handleGovChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm font-semibold"
                   >
                     {GOVERNORATES.map((gov) => (
                       <option key={gov.nameEn} value={gov.nameEn}>
@@ -338,7 +344,7 @@ export default function CheckoutPage() {
                     disabled
                     name="country"
                     value="EG"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 text-slate-550 dark:text-slate-400 cursor-not-allowed focus:outline-none text-sm font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-105 dark:bg-slate-800/80 text-slate-550 dark:text-slate-400 cursor-not-allowed focus:outline-none text-sm font-semibold"
                   >
                     <option value="EG">{isRtl ? "مصر فقط" : "Egypt Only"}</option>
                   </select>
@@ -348,7 +354,7 @@ export default function CheckoutPage() {
 
             {/* Payment Method Selector */}
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>3</span>
                 {t("paymentMethod")}
               </h2>
@@ -360,7 +366,7 @@ export default function CheckoutPage() {
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-850 dark:text-white">{t("cashOnDelivery")}</p>
+                  <p className="text-sm font-bold text-slate-855 dark:text-white">{t("cashOnDelivery")}</p>
                   <p className="text-xs text-slate-400 mt-0.5">{isRtl ? "ادفع نقداً عند استلام شحنتك" : "Pay with cash upon delivery"}</p>
                 </div>
               </div>
@@ -368,7 +374,7 @@ export default function CheckoutPage() {
 
             {/* Additional Notes */}
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>4</span>
                 {t("additionalNotes")}
               </h2>
@@ -380,7 +386,7 @@ export default function CheckoutPage() {
                   onChange={handleInputChange}
                   rows={3}
                   placeholder={t("notesPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
             </div>

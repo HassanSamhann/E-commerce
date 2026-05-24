@@ -182,6 +182,11 @@ export default function StorefrontProductDetailsPage() {
         {/* Right Column: Meta & Actions */}
         <div className="lg:col-span-6 space-y-6">
           <div className="space-y-2">
+            {product.quantity > 0 && product.quantity < 10 && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-black animate-pulse border border-amber-500/20 shadow-sm shadow-amber-500/5 mb-2">
+                <span>🔥 {isRtl ? `عاجل: متبقي ${product.quantity} قطع فقط في المخزن!` : `Hurry up: Only ${product.quantity} items left in stock!`}</span>
+              </div>
+            )}
             {product.category && (
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">
                 {product.category.name}
@@ -193,8 +198,8 @@ export default function StorefrontProductDetailsPage() {
           </div>
 
           {/* Price Box */}
-          <div className="p-5 bg-slate-50/50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-850 flex items-center gap-4">
-            <span className="text-2xl font-black text-slate-850 dark:text-white">
+          <div className="p-5 bg-slate-50/50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-855 flex items-center gap-4">
+            <span className="text-2xl font-black text-slate-855 dark:text-white">
               {formatCurrency(Number(product.price), store.currency)}
             </span>
             {hasDiscount && (
@@ -227,7 +232,7 @@ export default function StorefrontProductDetailsPage() {
                   <button
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 transition-colors disabled:opacity-40"
+                    className="p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-855 text-slate-500 transition-colors disabled:opacity-40"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -236,22 +241,45 @@ export default function StorefrontProductDetailsPage() {
                   </span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 transition-colors"
+                    className="p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-855 text-slate-500 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 py-4 px-6 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg hover:opacity-95"
+                  className="flex-1 py-4 px-6 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg hover:opacity-95 shadow-indigo-500/10 hover:scale-[1.01] active:scale-[0.99] duration-150"
                   style={{ backgroundColor: store.primaryColor || "#6366f1" }}
                 >
                   <ShoppingBag className="w-5 h-5" />
                   {isRtl ? "إضافة لسلة المشتريات" : "Add to Shopping Cart"}
                 </button>
+
+                {store.phone && (
+                  <a
+                    href={`https://wa.me/${(() => {
+                      const cleaned = store.phone.replace(/\D/g, "");
+                      if (cleaned.startsWith("0")) return "2" + cleaned;
+                      if (cleaned.startsWith("20")) return cleaned;
+                      return "20" + cleaned;
+                    })()}?text=${encodeURIComponent(
+                      isRtl
+                        ? `مرحباً، أود طلب منتج: ${product.name}\nبسعر: ${formatCurrency(product.price, store.currency)}\nالكمية: ${quantity}\nرابط المنتج: ${typeof window !== "undefined" ? window.location.href : ""}`
+                        : `Hello, I want to order: ${product.name}\nPrice: ${formatCurrency(product.price, store.currency)}\nQuantity: ${quantity}\nLink: ${typeof window !== "undefined" ? window.location.href : ""}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-4 px-6 bg-emerald-600 hover:bg-emerald-750 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/15 hover:scale-[1.01] active:scale-[0.99] duration-150 text-center"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-white">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 1.981 14.113.975 11.488.975c-5.442 0-9.866 4.372-9.87 9.802 0 1.698.48 3.35 1.387 4.825L1.97 21.03l5.677-1.876zm13.125-9.351c-.322-.16-.1.21-.83-.16-.403-.201-2.39-1.177-2.761-1.31-.37-.134-.64-.201-.91.201-.27.402-1.042 1.31-1.277 1.578-.235.268-.47.301-.79.141-.322-.16-1.362-.501-2.594-1.599-.958-.853-1.602-1.908-1.79-2.22-.19-.311-.02-.48.14-.64.14-.14.32-.37.48-.56.16-.18.21-.31.32-.51.11-.2.05-.38-.03-.54-.08-.16-.91-2.206-1.246-3.009-.329-.787-.663-.681-.912-.693-.235-.011-.504-.014-.772-.014-.27 0-.71.1-1.08.5-.37.4-1.41 1.38-1.41 3.367s1.44 3.9 1.64 4.168c.2.268 2.83 4.302 6.85 6.043 4.02 1.741 4.02 1.16 4.75 1.08.73-.08 2.39-.974 2.72-1.916.33-.942.33-1.751.23-1.918-.1-.168-.37-.268-.69-.428z" />
+                    </svg>
+                    <span>{isRtl ? "طلب مباشر عبر واتساب" : "Direct WhatsApp Order"}</span>
+                  </a>
+                )}
               </div>
             </div>
           )}
