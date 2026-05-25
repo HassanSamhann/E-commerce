@@ -4,11 +4,12 @@ import { authenticate, requireTenant, AuthRequest } from "../middlewares/auth.mi
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { supabase } from "../lib/supabase";
 
 const router = Router();
 router.use(authenticate, requireTenant);
 
-// Ensure uploads folder exists
+// Ensure uploads folder exists (fallback for static files if any pre-existing)
 const uploadsDir = path.join(process.cwd(), "uploads");
 try {
   if (!fs.existsSync(uploadsDir) && !process.env.VERCEL) {
@@ -18,41 +19,14 @@ try {
   console.warn("Failed to create uploads directory on startup (read-only filesystem):", error);
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (process.env.VERCEL) {
-      const tmpDir = "/tmp/uploads";
-      try {
-        if (!fs.existsSync(tmpDir)) {
-          fs.mkdirSync(tmpDir, { recursive: true });
-        }
-      } catch (err) {
-        console.error("Failed to create temp uploads directory:", err);
-      }
-      cb(null, tmpDir);
-    } else {
-      try {
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-      } catch (err) {
-        console.error("Failed to create uploads directory:", err);
-      }
-      cb(null, uploadsDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
-// POST /api/media/upload - Upload file to local server
+// POST /api/media/upload - Upload file to Supabase Storage
 router.post("/upload", upload.single("file"), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.file) {
@@ -60,22 +34,38 @@ router.post("/upload", upload.single("file"), async (req: AuthRequest, res: Resp
       return;
     }
 
-    const host = req.get("host");
-    // Ensure we use the correct protocol (or fall back to http)
-    const protocol = req.headers["x-forwarded-proto"] || req.protocol;
-    const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+    const file = req.file;
+    const fileExt = path.extname(file.originalname);
+    const uniqueFileName = `${req.tenant!.id}/${Date.now()}-${Math.round(Math.random() * 1e9)}${fileExt}`;
+
+    const { data, error } = await supabase.storage
+      .from("media")
+      .upload(uniqueFileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true,
+      });
+
+    if (error) {
+      console.error("Supabase storage upload error:", error);
+      res.status(500).json({ error: `Upload failed: ${error.message}` });
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("media")
+      .getPublicUrl(uniqueFileName);
 
     const media = await prisma.media.create({
       data: {
         tenantId: req.tenant!.id,
-        url: fileUrl,
-        filename: req.file.originalname,
-        mimeType: req.file.mimetype,
-        size: req.file.size,
+        url: publicUrl,
+        filename: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
       },
     });
 
-    res.status(201).json({ media, url: fileUrl });
+    res.status(201).json({ media, url: publicUrl });
   } catch (error) {
     next(error);
   }
