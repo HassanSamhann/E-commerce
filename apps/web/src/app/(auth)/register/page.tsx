@@ -62,7 +62,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="text-xs text-slate-500 font-medium">تواصل مع المدير على</p>
-              <p className="text-sm font-black text-white mt-0.5">demo@shop.com</p>
+              <p className="text-sm font-black text-white mt-0.5">hassan700019@gmail.com</p>
             </div>
           </div>
 

@@ -135,7 +135,7 @@ export const requireSuperAdmin = (
   res: Response,
   next: NextFunction
 ): void => {
-  const superAdmins = ["demo@shop.com", "hassan700019@gmail.com"];
+  const superAdmins = ["hassan700019@gmail.com"];
   if (!req.user || !superAdmins.includes(req.user.email)) {
     res.status(403).json({ error: "Access denied. Super Admin role required." });
     return;

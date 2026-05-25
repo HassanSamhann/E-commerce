@@ -68,7 +68,7 @@ npm run dev
 - 🗄 **Prisma Studio**: `cd packages/database && npx prisma studio`
 
 ## 🔐 Demo Credentials
-- Email: `demo@shop.com`
+- Email: `hassan700019@gmail.com`
 - Password: `Demo@12345`
 
 ## 📡 API Endpoints

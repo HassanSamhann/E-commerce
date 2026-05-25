@@ -46,7 +46,7 @@ export function Sidebar() {
   const { t, language } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
 
-  const isSuperAdmin = user?.email === "demo@shop.com";
+  const isSuperAdmin = user?.email === "hassan700019@gmail.com";
 
   // Fetch badge counts from dashboard
   const { data: dashData } = useQuery({

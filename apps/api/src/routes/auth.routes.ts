@@ -23,7 +23,7 @@ router.post(
   "/register",
   async (req: Request, res: Response) => {
     res.status(403).json({
-      error: "Public registration is disabled. Please contact the administrator (demo@shop.com) to set up your store.",
+      error: "Public registration is disabled. Please contact the administrator (hassan700019@gmail.com) to set up your store.",
     });
   }
 );

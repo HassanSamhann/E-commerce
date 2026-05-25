@@ -144,7 +144,7 @@ export default function LoginPage() {
         {/* Demo credentials */}
         <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/10 text-center">
           <p className="text-xs text-slate-400">
-            Demo: <span className="text-slate-300 font-mono">demo@shop.com</span> /{" "}
+            Demo: <span className="text-slate-300 font-mono">hassan700019@gmail.com</span> /{" "}
             <span className="text-slate-300 font-mono">Demo@12345</span>
           </p>
         </div>

@@ -93,7 +93,7 @@ export default function AdminPage() {
 
   // Guard: redirect if not super admin
   useEffect(() => {
-    if (!authLoading && user && user.email !== "demo@shop.com") {
+    if (!authLoading && user && user.email !== "hassan700019@gmail.com") {
       router.push("/dashboard");
     }
   }, [user, authLoading, router]);
@@ -102,14 +102,14 @@ export default function AdminPage() {
   const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
     queryKey: ["admin-tenants"],
     queryFn: () => api.get("/api/admin/tenants").then((r) => r.data),
-    enabled: !!user && user.email === "demo@shop.com",
+    enabled: !!user && user.email === "hassan700019@gmail.com",
   });
 
   // Fetch users
   const { data: usersData, isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => api.get("/api/admin/users").then((r) => r.data),
-    enabled: !!user && user.email === "demo@shop.com",
+    enabled: !!user && user.email === "hassan700019@gmail.com",
   });
 
   const tenants: Tenant[] = tenantsData?.tenants || [];
@@ -178,7 +178,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!user || user.email !== "demo@shop.com") return null;
+  if (!user || user.email !== "hassan700019@gmail.com") return null;
 
   return (
     <div className="space-y-6" dir="rtl">
