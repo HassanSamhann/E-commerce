@@ -10,13 +10,36 @@ router.use(authenticate, requireTenant);
 
 // Ensure uploads folder exists
 const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadsDir) && !process.env.VERCEL) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn("Failed to create uploads directory on startup (read-only filesystem):", error);
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    if (process.env.VERCEL) {
+      const tmpDir = "/tmp/uploads";
+      try {
+        if (!fs.existsSync(tmpDir)) {
+          fs.mkdirSync(tmpDir, { recursive: true });
+        }
+      } catch (err) {
+        console.error("Failed to create temp uploads directory:", err);
+      }
+      cb(null, tmpDir);
+    } else {
+      try {
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+      } catch (err) {
+        console.error("Failed to create uploads directory:", err);
+      }
+      cb(null, uploadsDir);
+    }
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
