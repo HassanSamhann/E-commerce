@@ -68,6 +68,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: m.role,
       })) || [];
       setTenants(userTenants);
+
+      // Auto-select first tenant if none is currently selected in localStorage
+      const savedTenant = localStorage.getItem("currentTenant");
+      if (!savedTenant && userTenants.length > 0) {
+        const tenant = userTenants[0];
+        setCurrentTenant(tenant);
+        localStorage.setItem("currentTenant", JSON.stringify(tenant));
+        api.defaults.headers.common["x-tenant-slug"] = tenant.slug;
+      } else if (savedTenant) {
+        try {
+          const tenant = JSON.parse(savedTenant);
+          if (tenant && tenant.slug) {
+            setCurrentTenant(tenant);
+            api.defaults.headers.common["x-tenant-slug"] = tenant.slug;
+          }
+        } catch (e) {
+          console.error("Failed to parse saved tenant", e);
+        }
+      }
     } catch {
       logout();
     } finally {

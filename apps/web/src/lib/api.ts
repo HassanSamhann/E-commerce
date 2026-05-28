@@ -5,11 +5,23 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor - add token
+// Request interceptor - add token and tenant slug
 api.interceptors.request.use((config) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  const savedTenant = typeof window !== "undefined" ? localStorage.getItem("currentTenant") : null;
+  if (savedTenant) {
+    try {
+      const tenant = JSON.parse(savedTenant);
+      if (tenant && tenant.slug) {
+        config.headers["x-tenant-slug"] = tenant.slug;
+      }
+    } catch (e) {
+      console.error("Error parsing currentTenant from localStorage", e);
+    }
   }
   return config;
 });
