@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/language.context";
+
 const GOVERNORATES = [
   { nameAr: "القاهرة", nameEn: "Cairo", fee: 50 },
   { nameAr: "الجيزة", nameEn: "Giza", fee: 50 },
@@ -40,6 +41,7 @@ const GOVERNORATES = [
   { nameAr: "شمال سيناء", nameEn: "North Sinai", fee: 120 },
   { nameAr: "جنوب سيناء", nameEn: "South Sinai", fee: 120 },
 ];
+
 export default function CheckoutPage() {
   const params = useParams();
   const router = useRouter();
@@ -135,9 +137,9 @@ export default function CheckoutPage() {
   // If store is loading, show loading spinner
   if (isStoreLoading || !store) {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
+      <div className="flex flex-col items-center justify-center py-24 bg-zinc-50 dark:bg-black">
         <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-medium text-slate-400 mt-2">
+        <p className="text-sm font-medium text-zinc-400 mt-2">
           {isRtl ? "جاري تحميل صفحة الدفع..." : "Loading checkout..."}
         </p>
       </div>
@@ -152,47 +154,47 @@ export default function CheckoutPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100 }}
-          className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-xl shadow-slate-100/50 dark:shadow-none"
+          className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-8 sm:p-12 shadow-xl shadow-zinc-100/50 dark:shadow-none"
         >
           <div className="flex justify-center mb-6">
             <CheckCircle className="w-16 h-16 text-emerald-500 animate-bounce" />
           </div>
           
-          <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white">
+          <h1 className="text-2xl font-extrabold text-zinc-800 dark:text-white">
             {t("orderConfirmed")}
           </h1>
-          <p className="text-sm text-slate-400 mt-2">
+          <p className="text-sm text-zinc-405 mt-2">
             {isRtl ? (
               <>
-                شكراً لتسوقك من متجر <span className="font-semibold text-slate-650 dark:text-slate-200">{store.name}</span>. تم تسجيل طلبك بنجاح!
+                شكراً لتسوقك من متجر <span className="font-semibold text-zinc-650 dark:text-zinc-205">{store.name}</span>. تم تسجيل طلبك بنجاح!
               </>
             ) : (
               <>
-                Thank you for shopping with <span className="font-semibold text-slate-600 dark:text-slate-200">{store.name}</span>. Your order has been placed.
+                Thank you for shopping with <span className="font-semibold text-zinc-600 dark:text-zinc-200">{store.name}</span>. Your order has been placed.
               </>
             )}
           </p>
 
-          <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-left space-y-3" dir={isRtl ? "rtl" : "ltr"}>
+          <div className="mt-8 p-6 bg-zinc-100/30 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-left space-y-3" dir={isRtl ? "rtl" : "ltr"}>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400 font-medium">{t("orderNumber")}</span>
-              <span className="text-slate-800 dark:text-white font-bold">{placedOrder.orderNumber}</span>
+              <span className="text-zinc-400 font-medium">{t("orderNumber")}</span>
+              <span className="text-zinc-800 dark:text-white font-bold">{placedOrder.orderNumber}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400 font-medium">{t("status")}</span>
+              <span className="text-zinc-400 font-medium">{t("status")}</span>
               <span className="text-amber-600 font-bold uppercase">
                 {isRtl && placedOrder.status === "PENDING" ? "في انتظار التأكيد" : placedOrder.status}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400 font-medium">{t("totalPaid")}</span>
-              <span className="text-slate-800 dark:text-white font-extrabold">
+              <span className="text-zinc-400 font-medium">{t("totalPaid")}</span>
+              <span className="text-zinc-800 dark:text-white font-extrabold">
                 {formatCurrency(Number(placedOrder.total), store.currency)}
               </span>
             </div>
-            <div className="flex justify-between text-sm border-t border-slate-200/50 dark:border-slate-700/50 pt-3">
-              <span className="text-slate-400 font-medium">{t("shippingTo")}</span>
-              <span className="text-slate-700 dark:text-slate-350 text-right truncate max-w-[200px]">
+            <div className="flex justify-between text-sm border-t border-zinc-200/50 dark:border-zinc-800/50 pt-3">
+              <span className="text-zinc-400 font-medium">{t("shippingTo")}</span>
+              <span className="text-zinc-700 dark:text-zinc-300 text-right truncate max-w-[200px]">
                 {placedOrder.shippingAddress?.address}، {placedOrder.shippingAddress?.city}
               </span>
             </div>
@@ -213,12 +215,12 @@ export default function CheckoutPage() {
   // If cart is empty, show Empty State
   if (cartItems.length === 0) {
     return (
-      <div className="max-w-md mx-auto text-center py-16 px-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl mt-8">
-        <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8 text-slate-450 opacity-60 animate-pulse" />
+      <div className="max-w-md mx-auto text-center py-16 px-4 bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl mt-8">
+        <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center mx-auto mb-4">
+          <ShoppingBag className="w-8 h-8 text-zinc-450 opacity-60 animate-pulse" />
         </div>
-        <h2 className="text-lg font-bold text-slate-850 dark:text-white">{t("cartIsEmpty")}</h2>
-        <p className="text-sm text-slate-400 mt-2 max-w-xs mx-auto">
+        <h2 className="text-lg font-bold text-zinc-800 dark:text-white">{t("cartIsEmpty")}</h2>
+        <p className="text-sm text-zinc-400 mt-2 max-w-xs mx-auto">
           {t("cartIsEmptyDesc")}
         </p>
         <Link
@@ -233,22 +235,23 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-zinc-50 dark:bg-black p-4 rounded-3xl">
       <style>{`
         .dynamic-focus-input:focus {
           border-color: ${store.primaryColor || "#6366f1"} !important;
           box-shadow: 0 0 0 2px ${(store.primaryColor || "#6366f1")}20 !important;
         }
       `}</style>
+      
       {/* Back button */}
       <div>
         <Link
           href={`/store/${slug}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
         >
           {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t("continueShopping")}
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-850 dark:text-white mt-4">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-4">
           {t("checkoutSecurely")}
         </h1>
       </div>
@@ -258,16 +261,16 @@ export default function CheckoutPage() {
         <div className="lg:col-span-7">
           <form
             onSubmit={handleCheckoutSubmit}
-            className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
+            className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
           >
             <div className="space-y-4">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>1</span>
                 {t("contactInfo")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("fullName")}</label>
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("fullName")}</label>
                   <input
                     required
                     type="text"
@@ -275,11 +278,11 @@ export default function CheckoutPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder={t("fullNamePlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm animate-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("phoneNumber")}</label>
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("phoneNumber")}</label>
                   <input
                     required
                     type="tel"
@@ -287,12 +290,12 @@ export default function CheckoutPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder={t("phoneNumberPlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                   />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("emailAddress")}</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("emailAddress")}</label>
                 <input
                   required
                   type="email"
@@ -300,18 +303,18 @@ export default function CheckoutPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder={t("emailAddressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
             </div>
 
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>2</span>
                 {t("shippingAddress")}
               </h2>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("addressLine")}</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("addressLine")}</label>
                 <input
                   required
                   type="text"
@@ -319,17 +322,17 @@ export default function CheckoutPage() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder={t("addressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("city")}</label>
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("city")}</label>
                   <select
                     name="city"
                     value={selectedGov.nameEn}
                     onChange={handleGovChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm font-semibold"
                   >
                     {GOVERNORATES.map((gov) => (
                       <option key={gov.nameEn} value={gov.nameEn}>
@@ -339,12 +342,12 @@ export default function CheckoutPage() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("country")}</label>
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("country")}</label>
                   <select
                     disabled
                     name="country"
                     value="EG"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-105 dark:bg-slate-800/80 text-slate-550 dark:text-slate-400 cursor-not-allowed focus:outline-none text-sm font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 cursor-not-allowed focus:outline-none text-sm font-semibold"
                   >
                     <option value="EG">{isRtl ? "مصر فقط" : "Egypt Only"}</option>
                   </select>
@@ -354,39 +357,39 @@ export default function CheckoutPage() {
 
             {/* Payment Method Selector */}
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>3</span>
                 {t("paymentMethod")}
               </h2>
               <div 
-                className="p-4 rounded-2xl border-2 bg-slate-50/50 dark:bg-slate-850/50 flex items-center gap-3 transition-all"
+                className="p-4 rounded-2xl border-2 bg-zinc-50/50 dark:bg-zinc-900/50 flex items-center gap-3 transition-all"
                 style={{ borderColor: store.primaryColor || "#6366f1" }}
               >
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 animate-pulse">
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-855 dark:text-white">{t("cashOnDelivery")}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{isRtl ? "ادفع نقداً عند استلام شحنتك" : "Pay with cash upon delivery"}</p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-white">{t("cashOnDelivery")}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">{isRtl ? "ادفع نقداً عند استلام شحنتك" : "Pay with cash upon delivery"}</p>
                 </div>
               </div>
             </div>
 
             {/* Additional Notes */}
             <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800/60 pb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>4</span>
                 {t("additionalNotes")}
               </h2>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("orderNotesOptional")}</label>
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("orderNotesOptional")}</label>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={3}
                   placeholder={t("notesPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
                 />
               </div>
             </div>
@@ -412,10 +415,10 @@ export default function CheckoutPage() {
 
         {/* Right Summary Column */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-            <h2 className="text-base font-bold text-slate-850 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center justify-between">
+          <div className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+            <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between">
               {t("orderSummary")}
-              <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-650 px-2 py-0.5 rounded-full font-bold">
+              <span className="text-xs bg-zinc-100 dark:bg-zinc-900 text-zinc-600 px-2 py-0.5 rounded-full font-bold">
                 {cartItems.length} {isRtl ? "منتجات" : "items"}
               </span>
             </h2>
@@ -428,22 +431,22 @@ export default function CheckoutPage() {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100"
+                      className="w-12 h-12 rounded-xl object-cover bg-zinc-50 border border-zinc-150"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-450">
+                    <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-400">
                       <ShoppingBag className="w-5 h-5" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white line-clamp-1">
+                    <h4 className="text-xs font-bold text-zinc-800 dark:text-white line-clamp-1">
                       {item.name}
                     </h4>
-                    <p className="text-[11px] text-slate-450 mt-0.5">
+                    <p className="text-[11px] text-zinc-400 mt-0.5">
                       {isRtl ? "الكمية" : "Quantity"}: {item.quantity}
                     </p>
                   </div>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
                     {formatCurrency(item.price * item.quantity, store.currency)}
                   </span>
                 </div>
@@ -451,20 +454,20 @@ export default function CheckoutPage() {
             </div>
 
             {/* Breakdown */}
-            <div className="border-t border-slate-50 dark:border-slate-800 pt-4 space-y-3">
-              <div className="flex justify-between text-xs text-slate-450 font-semibold">
+            <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-3">
+              <div className="flex justify-between text-xs text-zinc-400 font-semibold">
                 <span>{t("subtotal")}</span>
-                <span className="text-slate-750 dark:text-slate-350">
+                <span className="text-zinc-700 dark:text-zinc-300">
                   {formatCurrency(cartTotal, store.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-xs text-slate-450 font-semibold">
+              <div className="flex justify-between text-xs text-zinc-400 font-semibold">
                 <span>{t("shippingFee")}</span>
                 <span className="text-brand-500 font-extrabold">
                   {formatCurrency(selectedGov.fee, store.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-slate-800 dark:text-white font-extrabold border-t border-slate-50 dark:border-slate-800 pt-3">
+              <div className="flex justify-between text-sm text-zinc-800 dark:text-white font-extrabold border-t border-zinc-100 dark:border-zinc-800 pt-3">
                 <span>{t("totalAmount")}</span>
                 <span>{formatCurrency(cartTotal + selectedGov.fee, store.currency)}</span>
               </div>

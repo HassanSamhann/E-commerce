@@ -58,9 +58,9 @@ export default function StorefrontPage() {
 
   if (isStoreLoading || !store) {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
+      <div className="flex flex-col items-center justify-center py-24 bg-zinc-50 dark:bg-black">
         <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-medium text-slate-400 mt-2">
+        <p className="text-sm font-medium text-zinc-400 mt-2">
           {language === "ar" ? "جاري تحميل المتجر..." : "Loading store catalog..."}
         </p>
       </div>
@@ -124,7 +124,7 @@ export default function StorefrontPage() {
                 {store.name}
               </h1>
               {store.description && (
-                <p className="text-xs sm:text-sm text-slate-200 mt-1 font-semibold">
+                <p className="text-xs sm:text-sm text-zinc-200 mt-1 font-semibold">
                   {store.description}
                 </p>
               )}
@@ -151,7 +151,7 @@ export default function StorefrontPage() {
               const el = document.getElementById("catalog-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="px-6 py-3 rounded-2xl font-black text-xs transition-transform hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer bg-white text-slate-900"
+            className="px-6 py-3 rounded-2xl font-black text-xs transition-transform hover:scale-105 shadow-md flex items-center gap-2 cursor-pointer bg-white text-zinc-900"
           >
             <span>{isRtl ? "تصفح المنتجات الآن" : "Browse Products Now"}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
@@ -161,7 +161,7 @@ export default function StorefrontPage() {
 
       {/* 3. Dynamic Categories Filter Bar (Taager Style) */}
       {store.categories && store.categories.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 flex flex-col gap-4 transition-colors shadow-sm">
+        <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/60 p-5 flex flex-col gap-4 transition-colors shadow-sm">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
             <button
               onClick={() => setSelectedCategoryId(null)}
@@ -169,7 +169,7 @@ export default function StorefrontPage() {
                 "px-4.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200",
                 selectedCategoryId === null
                   ? "text-white shadow-md"
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-750"
+                  : "bg-zinc-55 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
               )}
               style={{
                 backgroundColor: selectedCategoryId === null ? store.primaryColor || taagerTeal : undefined,
@@ -187,7 +187,7 @@ export default function StorefrontPage() {
                     "px-4.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200",
                     isActive
                       ? "text-white shadow-md"
-                      : "bg-slate-50 dark:bg-slate-800 text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-750"
+                      : "bg-zinc-55 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   )}
                   style={{
                     backgroundColor: isActive ? store.primaryColor || taagerTeal : undefined,
@@ -201,8 +201,8 @@ export default function StorefrontPage() {
 
           {/* Secondary Sub-categories row */}
           {activeParentCategory && activeParentCategory.children && activeParentCategory.children.length > 0 && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-slate-50 dark:border-slate-850 pt-3 max-w-full no-scrollbar">
-              <span className="text-xs font-bold text-slate-400 flex-shrink-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-zinc-100 dark:border-zinc-850 pt-3 max-w-full no-scrollbar">
+              <span className="text-xs font-bold text-zinc-400 flex-shrink-0">
                 {isRtl ? "الفئة الفرعية:" : "Subcategory:"}
               </span>
               <button
@@ -211,7 +211,7 @@ export default function StorefrontPage() {
                   "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-200",
                   selectedCategoryId === activeParentCategory.id
                     ? "text-white"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
                 )}
                 style={{
                   backgroundColor: selectedCategoryId === activeParentCategory.id ? store.primaryColor || taagerTeal : undefined,
@@ -227,7 +227,7 @@ export default function StorefrontPage() {
                     "px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-200",
                     selectedCategoryId === sub.id
                       ? "text-white"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
                   )}
                   style={{
                     backgroundColor: selectedCategoryId === sub.id ? store.primaryColor || taagerTeal : undefined,
@@ -243,12 +243,12 @@ export default function StorefrontPage() {
 
       {/* 4. Products Grid Section (Taager Style) */}
       <div id="catalog-section" className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <h3 className="text-lg font-black text-slate-850 dark:text-white flex items-center gap-2">
+        <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 pb-3">
+          <h3 className="text-lg font-black text-zinc-900 dark:text-white flex items-center gap-2">
             <span className="w-2 h-5 rounded-full" style={{ backgroundColor: store.primaryColor || taagerTeal }} />
             {isRtl ? "منتجات مميزة" : "Featured Products"}
           </h3>
-          <span className="text-xs font-bold text-slate-400">
+          <span className="text-xs font-bold text-zinc-400">
             {products.length} {isRtl ? "منتجات متوفرة" : "products available"}
           </span>
         </div>
@@ -259,12 +259,12 @@ export default function StorefrontPage() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden p-4 space-y-4 shadow-sm"
+                className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl overflow-hidden p-4 space-y-4 shadow-sm"
               >
-                <div className="h-48 w-full rounded-2xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-                <div className="h-4 w-2/3 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
-                <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
-                <div className="h-10 w-full bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse mt-4" />
+                <div className="h-48 w-full rounded-2xl bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
+                <div className="h-4 w-2/3 bg-zinc-100 dark:bg-zinc-900 rounded animate-pulse" />
+                <div className="h-4 w-1/2 bg-zinc-100 dark:bg-zinc-900 rounded animate-pulse" />
+                <div className="h-10 w-full bg-zinc-100 dark:bg-zinc-900 rounded-xl animate-pulse mt-4" />
               </div>
             ))}
           </div>
@@ -273,15 +273,15 @@ export default function StorefrontPage() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center text-center py-16 px-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl"
+            className="flex flex-col items-center justify-center text-center py-16 px-4 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl"
           >
-            <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4">
-              <ShoppingBag className="w-8 h-8 text-slate-400 opacity-60" />
+            <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center mb-4">
+              <ShoppingBag className="w-8 h-8 text-zinc-400 opacity-60" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+            <h3 className="text-lg font-bold text-zinc-800 dark:text-white">
               {t("noProductsFound")}
             </h3>
-            <p className="text-sm text-slate-400 mt-1 max-w-sm">
+            <p className="text-sm text-zinc-400 mt-1 max-w-sm">
               {t("noProductsFoundDesc")}
             </p>
           </motion.div>
@@ -311,13 +311,13 @@ export default function StorefrontPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60 rounded-[24px] overflow-hidden p-4 flex flex-col justify-between shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5 transition-all duration-300 relative"
+                    className="group bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-[24px] overflow-hidden p-4 flex flex-col justify-between shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 transition-all duration-300 relative"
                   >
                     {/* Link to details page wrapping Image & Metadata */}
                     <Link href={`/store/${slug}/products/${product.id}`} className="flex-1 flex flex-col group cursor-pointer">
                       
                       {/* Image / Gallery */}
-                      <div className="relative h-52 w-full rounded-[18px] overflow-hidden bg-slate-50 dark:bg-slate-800/40 mb-4 border border-slate-50 dark:border-slate-850">
+                      <div className="relative h-52 w-full rounded-[18px] overflow-hidden bg-zinc-55 dark:bg-zinc-900/40 mb-4 border border-zinc-200/80 dark:border-zinc-800/60">
                         {product.images?.[0]?.url ? (
                           <img
                             src={product.images[0].url}
@@ -325,7 +325,7 @@ export default function StorefrontPage() {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-slate-355 bg-slate-50 dark:bg-slate-800/50">
+                          <div className="w-full h-full flex items-center justify-center text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50">
                             <Package className="w-12 h-12 stroke-[1.25]" />
                           </div>
                         )}
@@ -349,8 +349,8 @@ export default function StorefrontPage() {
 
                         {/* Stock badge */}
                         {outOfStock && (
-                          <div className="absolute inset-0 bg-white/75 dark:bg-slate-900/75 backdrop-blur-[2px] flex items-center justify-center z-10">
-                            <span className="bg-slate-900 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-lg border border-white/10">
+                          <div className="absolute inset-0 bg-white/75 dark:bg-zinc-900/75 backdrop-blur-[2px] flex items-center justify-center z-10">
+                            <span className="bg-zinc-900 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-lg border border-white/10">
                               {t("outOfStock")}
                             </span>
                           </div>
@@ -360,15 +360,15 @@ export default function StorefrontPage() {
                       {/* Metadata */}
                       <div className="flex-1 flex flex-col px-1.5">
                         {product.category && (
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">
+                          <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5 block">
                             {product.category.name}
                           </span>
                         )}
-                        <h3 className="text-sm font-extrabold text-slate-850 dark:text-white line-clamp-1 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-snug">
+                        <h3 className="text-sm font-extrabold text-zinc-850 dark:text-white line-clamp-1 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors leading-snug">
                           {product.name}
                         </h3>
                         {product.description && (
-                          <p className="text-xs text-slate-400 dark:text-slate-450 mt-1.5 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-zinc-400 dark:text-zinc-450 mt-1.5 line-clamp-2 leading-relaxed">
                             {product.description}
                           </p>
                         )}
@@ -376,14 +376,14 @@ export default function StorefrontPage() {
                     </Link>
 
                     {/* Pricing and CTA */}
-                    <div className="mt-4 pt-4 border-t border-slate-55 dark:border-slate-855 flex items-center justify-between px-1.5">
+                    <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between px-1.5">
                       <div>
                         {hasDiscount && (
-                          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 line-through block mb-0.5">
+                          <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-555 line-through block mb-0.5">
                             {formatCurrency(Number(product.comparePrice), store.currency)}
                           </span>
                         )}
-                        <span className="text-base font-black text-slate-850 dark:text-white">
+                        <span className="text-base font-black text-zinc-800 dark:text-white">
                           {formatCurrency(Number(product.price), store.currency)}
                         </span>
                       </div>
