@@ -240,13 +240,7 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
                   )}
                 </button>
               )}
-            </div>cartCount}
-                    </span>
-                  )}
-                </button>
-              )}
             </div>
-
           </div>
         </div>
       </header>
