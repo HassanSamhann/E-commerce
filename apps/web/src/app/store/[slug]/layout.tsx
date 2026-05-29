@@ -108,41 +108,74 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
       {/* 2. Main Header (Logo, Big Search, User Actions, Shipping Badge) */}
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/60 transition-colors shadow-sm py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             
-            {/* Left/Right Container: Logo & Country */}
-            <div className="flex items-center justify-between md:justify-start gap-6">
+            {/* Left/Right Container: Logo & compact mobile actions */}
+            <div className="flex items-center justify-between w-full md:w-auto gap-4">
               {/* Logo / Store Name */}
-              <Link href={`/store/${params.slug}`} className="flex items-center gap-2.5 group flex-shrink-0">
+              <Link href={`/store/${params.slug}`} className="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
                 {store.logoUrl ? (
                   <img
                     src={store.logoUrl}
                     alt={store.name}
-                    className="w-11 h-11 rounded-xl object-contain bg-zinc-50 border border-zinc-200 dark:border-zinc-800"
+                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-contain bg-zinc-50 border border-zinc-200 dark:border-zinc-800"
                   />
                 ) : (
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-black transition-transform group-hover:scale-105 shadow-md"
+                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white font-black transition-transform group-hover:scale-105 shadow-md"
                     style={{ backgroundColor: store.primaryColor || taagerTeal }}
                   >
-                    <Store className="w-6 h-6" />
+                    <Store className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                 )}
-                <span className="text-xl font-black text-zinc-900 dark:text-white tracking-tight group-hover:opacity-85 transition-opacity">
+                <span className="text-lg sm:text-xl font-black text-zinc-900 dark:text-white tracking-tight group-hover:opacity-85 transition-opacity">
                   {store.name}
                 </span>
               </Link>
 
-              {/* Ship to Egypt Badge */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-55 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 text-xs font-bold text-zinc-600 dark:text-zinc-400">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <MapPin className="w-3.5 h-3.5 text-zinc-450" />
-                <span>{isRtl ? "شحن إلى مصر" : "Ship to Egypt"}</span>
-                <span className="w-4 h-3 bg-red-650 inline-block relative ml-0.5 rounded-sm">🇪🇬</span>
+              {/* Mobile top actions - language, theme, cart to keep desktop clean */}
+              <div className="flex md:hidden items-center gap-1">
+                <LanguageSwitcher />
+                {mounted && (
+                  <button
+                    onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                    className="p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all focus:outline-none"
+                  >
+                    {resolvedTheme === "dark" ? (
+                      <Sun className="w-4.5 h-4.5 text-amber-500" />
+                    ) : (
+                      <Moon className="w-4.5 h-4.5 text-indigo-400" />
+                    )}
+                  </button>
+                )}
+                {!isCheckoutPage && (
+                  <button
+                    onClick={() => setIsCartOpen(true)}
+                    className="relative p-2 rounded-xl text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all"
+                  >
+                    <ShoppingCart className="w-4.5 h-4.5" />
+                    {cartCount > 0 && (
+                      <span
+                        className="absolute -top-1 -right-1 w-4.5 h-4.5 text-[9px] font-extrabold text-white rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950 animate-pulse shadow-sm"
+                        style={{ backgroundColor: store.primaryColor || taagerTeal }}
+                      >
+                        {cartCount}
+                      </span>
+                    )}
+                  </button>
+                )}
               </div>
+            </div>
+
+            {/* Ship to Egypt Badge — hidden on very small screens, shown on sm and above */}
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 text-xs font-bold text-zinc-600 dark:text-zinc-400 md:ml-4">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+              <span>{isRtl ? "شحن إلى مصر" : "Ship to Egypt"}</span>
+              <span className="w-4 h-3 bg-red-600 inline-block relative ml-0.5 rounded-sm">🇪🇬</span>
             </div>
 
             {/* Middle Container: Massive Search Bar */}
@@ -153,7 +186,7 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
                   placeholder={isRtl ? "ما الذي تبحث عنه؟" : "What are you looking for?"}
                   value={searchVal}
                   onChange={(e) => setSearchVal(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-transparent text-zinc-850 dark:text-white placeholder-zinc-400 focus:outline-none text-sm font-medium"
+                  className="w-full px-4 py-2.5 bg-transparent text-zinc-800 dark:text-white placeholder-zinc-400 focus:outline-none text-sm font-medium"
                 />
                 <button
                   type="submit"
@@ -166,8 +199,8 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
               </div>
             </form>
 
-            {/* Right Container: Wishlist, Cart & Switcher */}
-            <div className="flex items-center justify-end gap-3.5 flex-shrink-0">
+            {/* Right Container: Wishlist, Cart & Switcher — hidden on mobile */}
+            <div className="hidden md:flex items-center justify-end gap-3.5 flex-shrink-0">
               <LanguageSwitcher />
 
               {/* Theme Toggle Button */}
@@ -194,7 +227,7 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
               {!isCheckoutPage && (
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="relative p-2.5 rounded-xl text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all"
+                  className="relative p-2.5 rounded-xl text-zinc-650 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all"
                 >
                   <ShoppingCart className="w-5.5 h-5.5" />
                   {cartCount > 0 && (
@@ -207,6 +240,11 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
                   )}
                 </button>
               )}
+            </div>cartCount}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
 
           </div>
@@ -214,7 +252,7 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
       </header>
 
       {/* 3. Sub-Header Navigation (All Categories mega button, Home, About, Contact) */}
-      <div className="bg-white dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/60 py-2.5 transition-colors shadow-sm text-sm font-bold relative">
+      <div className="bg-white dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800/60 py-2.5 transition-colors shadow-sm text-sm font-bold relative hidden sm:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6" dir={isRtl ? "rtl" : "ltr"}>
           
           {/* Categories Button + Mega Menu trigger */}
@@ -247,7 +285,7 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
                     )}
                   >
                     {/* Column 1: Parent Categories */}
-                    <div className="w-48 bg-zinc-50 dark:bg-black/40 border-r dark:border-zinc-850 py-3 overflow-y-auto space-y-0.5 flex-shrink-0">
+                    <div className="w-48 bg-zinc-50 dark:bg-black/40 border-r dark:border-zinc-800 py-3 overflow-y-auto space-y-0.5 flex-shrink-0">
                       {store.categories.map((cat: any) => {
                         const isActive = activeParentCat?.id === cat.id;
                         return (
@@ -538,7 +576,7 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-10 h-10 animate-spin text-brand-500" />
-          <p className="text-sm font-medium text-zinc-405">Loading storefront...</p>
+          <p className="text-sm font-medium text-zinc-400">Loading storefront...</p>
         </div>
       </div>
     );
@@ -567,7 +605,7 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-150 transition-colors pb-16 sm:pb-0">
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-200 transition-colors pb-16 sm:pb-0">
       <StorefrontNavbar store={data} isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {React.cloneElement(children as React.ReactElement, { store: data })}
@@ -585,7 +623,7 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
                   <img
                     src={data.logoUrl}
                     alt={data.name}
-                    className="w-10 h-10 rounded-xl object-contain bg-zinc-50 border border-zinc-150 dark:border-zinc-800"
+                    className="w-10 h-10 rounded-xl object-contain bg-zinc-50 border border-zinc-200 dark:border-zinc-800"
                   />
                 ) : (
                   <div
@@ -658,15 +696,15 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
 
           {/* Trust and Payment Badges */}
           <div className="flex flex-wrap justify-center items-center gap-6 py-6 border-t border-zinc-100 dark:border-zinc-800/80 mb-6">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150 dark:border-zinc-850 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
               <span className="text-emerald-500 text-base">💵</span>
               <span>{isRtl ? "الدفع عند الاستلام كاش" : "Cash on Delivery"}</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150 dark:border-zinc-850 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
               <span className="text-blue-500 text-base">⚡</span>
               <span>{isRtl ? "شحن سريع وآمن" : "Fast & Secure Shipping"}</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-150 dark:border-zinc-850 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-xs font-bold text-zinc-500 dark:text-zinc-400 shadow-sm">
               <span className="text-indigo-500 text-base">🔒</span>
               <span>{isRtl ? "حماية وضمان الجودة" : "Quality Guarantee"}</span>
             </div>
@@ -706,7 +744,7 @@ function StorefrontLayoutContent({ children }: { children: React.ReactNode }) {
       </footer>
 
       {/* 4. Mobile Bottom Floating Sticky Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-lg border-t border-zinc-200 dark:border-zinc-850 px-6 py-2.5 flex items-center justify-between sm:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.06)] transition-all">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-lg border-t border-zinc-200 dark:border-zinc-800 px-6 py-2.5 flex items-center justify-between sm:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.06)] transition-all">
         {/* Home */}
         <Link 
           href={`/store/${slug}`}

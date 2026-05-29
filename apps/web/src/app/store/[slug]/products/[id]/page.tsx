@@ -78,7 +78,7 @@ export default function StorefrontProductDetailsPage() {
             </div>
 
             {/* Price box Shimmer */}
-            <div className="h-16 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded-2xl border border-zinc-150 dark:border-zinc-800/60" />
+            <div className="h-16 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-800/60" />
 
             {/* Description Shimmer */}
             <div className="space-y-2">
@@ -167,7 +167,7 @@ export default function StorefrontProductDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Left Column: Image Gallery */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative rounded-3xl overflow-hidden aspect-square bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 flex items-center justify-center shadow-sm">
+          <div className="relative rounded-3xl overflow-hidden aspect-square bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 flex items-center justify-center shadow-sm">
             {product.images?.[activeImageIdx]?.url ? (
               <img
                 src={product.images[activeImageIdx].url}
@@ -202,7 +202,7 @@ export default function StorefrontProductDetailsPage() {
                 <button
                   key={img.id}
                   onClick={() => setActiveImageIdx(idx)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 bg-white dark:bg-zinc-955 flex-shrink-0 transition-all ${
+                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 bg-white dark:bg-zinc-950 flex-shrink-0 transition-all ${
                     activeImageIdx === idx
                       ? "border-brand-500 shadow-sm"
                       : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
@@ -254,7 +254,7 @@ export default function StorefrontProductDetailsPage() {
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                 {isRtl ? "الوصف والتفاصيل" : "Description"}
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed bg-white dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-850 p-5 rounded-2xl whitespace-pre-line shadow-sm">
+              <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl whitespace-pre-line shadow-sm">
                 {product.description}
               </p>
             </div>
@@ -267,11 +267,11 @@ export default function StorefrontProductDetailsPage() {
                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                   {isRtl ? "الكمية المطلوبة:" : "Quantity:"}
                 </span>
-                <div className="flex items-center gap-3 bg-white dark:bg-zinc-955 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 shadow-sm">
+                <div className="flex items-center gap-3 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 shadow-sm">
                   <button
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-550 transition-colors disabled:opacity-40"
+                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 transition-colors disabled:opacity-40"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -280,7 +280,7 @@ export default function StorefrontProductDetailsPage() {
                   </span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-550 transition-colors"
+                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -325,7 +325,7 @@ export default function StorefrontProductDetailsPage() {
 
           {/* Trust Badges */}
           <div className="grid grid-cols-3 gap-4 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-955 rounded-2xl border border-zinc-150 dark:border-zinc-850 shadow-sm gap-2">
+            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
               <Truck className="w-5 h-5 text-emerald-500" />
               <div>
                 <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "شحن سريع" : "Fast Delivery"}</p>
@@ -333,7 +333,7 @@ export default function StorefrontProductDetailsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-955 rounded-2xl border border-zinc-150 dark:border-zinc-850 shadow-sm gap-2">
+            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
               <ShieldCheck className="w-5 h-5 text-blue-500" />
               <div>
                 <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "دفع آمن" : "Secure Payment"}</p>
@@ -341,7 +341,7 @@ export default function StorefrontProductDetailsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-955 rounded-2xl border border-zinc-150 dark:border-zinc-850 shadow-sm gap-2">
+            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
               <RotateCcw className="w-5 h-5 text-amber-500" />
               <div>
                 <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "استرجاع سهل" : "Easy Return"}</p>

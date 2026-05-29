@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Moon, Sun, LogOut, User, ChevronDown, Building2 } from "lucide-react";
+import { Bell, Moon, Sun, LogOut, User, ChevronDown, Building2, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/auth.context";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { user, logout, tenants, currentTenant, setCurrentTenant } = useAuth();
   const router = useRouter();
@@ -21,9 +21,18 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-6 flex-shrink-0">
-      {/* Left: Breadcrumb placeholder / Page title injected by pages */}
+    <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+      {/* Left: Hamburger menu + Breadcrumb placeholder */}
       <div className="flex items-center gap-2">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden p-2 -ml-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mr-1"
+            title="Open Sidebar"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
         {/* Tenant switcher (only if multiple tenants) */}
         {tenants.length > 1 && (
           <div className="relative">

@@ -154,7 +154,7 @@ export default function CheckoutPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100 }}
-          className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-8 sm:p-12 shadow-xl shadow-zinc-100/50 dark:shadow-none"
+          className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-8 sm:p-12 shadow-xl shadow-zinc-100/50 dark:shadow-none"
         >
           <div className="flex justify-center mb-6">
             <CheckCircle className="w-16 h-16 text-emerald-500 animate-bounce" />
@@ -163,10 +163,10 @@ export default function CheckoutPage() {
           <h1 className="text-2xl font-extrabold text-zinc-800 dark:text-white">
             {t("orderConfirmed")}
           </h1>
-          <p className="text-sm text-zinc-405 mt-2">
+          <p className="text-sm text-zinc-400 mt-2">
             {isRtl ? (
               <>
-                شكراً لتسوقك من متجر <span className="font-semibold text-zinc-650 dark:text-zinc-205">{store.name}</span>. تم تسجيل طلبك بنجاح!
+                شكراً لتسوقك من متجر <span className="font-semibold text-zinc-600 dark:text-zinc-200">{store.name}</span>. تم تسجيل طلبك بنجاح!
               </>
             ) : (
               <>
@@ -215,9 +215,9 @@ export default function CheckoutPage() {
   // If cart is empty, show Empty State
   if (cartItems.length === 0) {
     return (
-      <div className="max-w-md mx-auto text-center py-16 px-4 bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl mt-8">
+      <div className="max-w-md mx-auto text-center py-16 px-4 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl mt-8">
         <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8 text-zinc-450 opacity-60 animate-pulse" />
+          <ShoppingBag className="w-8 h-8 text-zinc-400 opacity-60 animate-pulse" />
         </div>
         <h2 className="text-lg font-bold text-zinc-800 dark:text-white">{t("cartIsEmpty")}</h2>
         <p className="text-sm text-zinc-400 mt-2 max-w-xs mx-auto">
@@ -261,7 +261,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-7">
           <form
             onSubmit={handleCheckoutSubmit}
-            className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
+            className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
           >
             <div className="space-y-4">
               <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
@@ -415,7 +415,7 @@ export default function CheckoutPage() {
 
         {/* Right Summary Column */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white dark:bg-zinc-955 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
             <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between">
               {t("orderSummary")}
               <span className="text-xs bg-zinc-100 dark:bg-zinc-900 text-zinc-600 px-2 py-0.5 rounded-full font-bold">
@@ -431,7 +431,7 @@ export default function CheckoutPage() {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-12 h-12 rounded-xl object-cover bg-zinc-50 border border-zinc-150"
+                      className="w-12 h-12 rounded-xl object-cover bg-zinc-50 border border-zinc-200"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-400">
