@@ -102,7 +102,8 @@ export default function StorefrontPage() {
   return (
     <div className="space-y-8" dir={isRtl ? "rtl" : "ltr"}>
       
-      {/* Premium Storefront Hero Banner */}
+      {/* Premium Storefront Hero Banner — only shown for Classic theme */}
+      {(!store.theme || store.theme === "classic") && (
       <div 
         className="relative text-white rounded-3xl p-8 sm:p-12 shadow-lg overflow-hidden border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6"
         style={{ 
@@ -159,6 +160,7 @@ export default function StorefrontPage() {
           </button>
         </div>
       </div>
+      )}
 
       {/* 3. Dynamic Categories Filter Bar (Taager Style) */}
       {store.categories && store.categories.length > 0 && (
