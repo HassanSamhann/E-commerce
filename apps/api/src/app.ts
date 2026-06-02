@@ -22,36 +22,58 @@ import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
+// ─── CORS (must come BEFORE helmet and all other middleware) ──────────────────
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+
+    const isLocal =
+      origin.startsWith("http://localhost:") ||
+      origin.startsWith("http://127.0.0.1:");
+
+    // Allow any *.vercel.app subdomain (covers preview & production deployments)
+    const isVercel = origin.endsWith(".vercel.app");
+
+    const isExplicitlyAllowed = allowedOrigins.includes(origin);
+
+    if (isLocal || isVercel || isExplicitlyAllowed) {
+      return callback(null, true);
+    }
+
+    // Allow custom domains for storefront tenants
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+    "x-tenant-id",
+  ],
+  exposedHeaders: ["Content-Length", "Content-Type"],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests for ALL routes
+// This is required for multipart/form-data (file uploads) which trigger a preflight
+app.options("*", cors(corsOptions));
+
 // ─── Security ─────────────────────────────────────────────────────────────────
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  process.env.FRONTEND_URL,
-].filter(Boolean) as string[];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      
-      const isAllowed = allowedOrigins.includes(origin) || 
-                        origin.startsWith("http://localhost:") || 
-                        origin.startsWith("http://127.0.0.1:") ||
-                        origin.endsWith(".vercel.app");
-      
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        // Also allow dynamic tenant custom domains in production
-        callback(null, true);
-      }
-    },
-    credentials: true,
   })
 );
 
