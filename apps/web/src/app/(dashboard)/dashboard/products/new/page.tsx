@@ -58,22 +58,27 @@ export default function NewProductPage() {
   const [newVariant, setNewVariant] = useState<Variant>({ name: "", price: 0, quantity: 0 });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
     try {
-      const response = await api.post("/api/media/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await api.post("/api/media/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        return response.data.url;
       });
-      setImageUrls((prev) => [...prev, response.data.url]);
-      toast({ title: "✅ تم رفع الصورة بنجاح!" });
+      const urls = await Promise.all(uploadPromises);
+      setImageUrls((prev) => [...prev, ...urls]);
+      toast({ title: `✅ تم رفع ${urls.length} صور بنجاح!` });
     } catch (err: unknown) {
-      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "فشل رفع الصورة";
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "فشل رفع بعض أو كل الصور";
       toast({ title: "خطأ في الرفع", description: message, variant: "destructive" });
     } finally {
       setIsUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -320,6 +325,7 @@ export default function NewProductPage() {
               <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-brand-500 transition-colors relative cursor-pointer group">
                 <input
                   type="file"
+                  multiple
                   accept="image/*"
                   onChange={handleFileUpload}
                   disabled={isUploading}

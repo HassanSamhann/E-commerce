@@ -81,6 +81,7 @@ export default function StorefrontPage() {
     addToCart(
       {
         id: product.id,
+        productId: product.id,
         name: product.name,
         price: Number(product.price),
         image: firstImage,

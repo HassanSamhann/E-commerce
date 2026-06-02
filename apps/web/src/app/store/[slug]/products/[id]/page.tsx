@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useCart } from "@/contexts/cart.context";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language.context";
@@ -30,11 +30,11 @@ export default function StorefrontProductDetailsPage() {
   const { addToCart, cartItems } = useCart();
   const { toast } = useToast();
   const { t, language } = useLanguage();
+  const isRtl = language === "ar";
 
   const [quantity, setQuantity] = useState(1);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-
-  const isRtl = language === "ar";
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
   // Fetch store details (reads from React Query cache instantly)
   const { data: store, isLoading: isStoreLoading } = useQuery({
@@ -51,6 +51,12 @@ export default function StorefrontProductDetailsPage() {
   });
 
   const product = productData;
+
+  React.useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      setSelectedVariant((prev: any) => prev || product.variants[0]);
+    }
+  }, [product]);
   const isLoading = isStoreLoading || isProductLoading;
 
   if (isLoading || !store) {
@@ -126,21 +132,33 @@ export default function StorefrontProductDetailsPage() {
     );
   }
 
-  const hasDiscount = product.comparePrice && Number(product.comparePrice) > Number(product.price);
-  const discountPercent = hasDiscount
-    ? Math.round(((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100)
+  const currentPrice = selectedVariant ? Number(selectedVariant.price) : (product ? Number(product.price) : 0);
+  const currentComparePrice = selectedVariant ? null : (product?.comparePrice ? Number(product.comparePrice) : null);
+  const hasDiscount = currentComparePrice !== null && currentComparePrice > currentPrice;
+  const discountPercent = hasDiscount && currentComparePrice
+    ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
     : 0;
 
-  const inCart = cartItems.some((item) => item.id === product.id);
-  const outOfStock = product.quantity <= 0;
+  const itemId = selectedVariant ? `${product?.id}-${selectedVariant.id}` : (product?.id || "");
+  const inCart = cartItems.some((item) => item.id === itemId);
+  const outOfStock = selectedVariant ? selectedVariant.quantity <= 0 : (product ? product.quantity <= 0 : true);
 
   const handleAddToCart = () => {
+    if (!product) return;
     const firstImage = product.images?.[0]?.url;
+    const finalItemId = selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id;
+    const finalName = product.name;
+    const finalPrice = selectedVariant ? Number(selectedVariant.price) : Number(product.price);
+    const toastDesc = selectedVariant ? `${product.name} (${selectedVariant.name})` : product.name;
+
     addToCart(
       {
-        id: product.id,
-        name: product.name,
-        price: Number(product.price),
+        id: finalItemId,
+        productId: product.id,
+        variantId: selectedVariant?.id,
+        variantName: selectedVariant?.name,
+        name: finalName,
+        price: finalPrice,
         image: firstImage,
       },
       quantity
@@ -148,7 +166,7 @@ export default function StorefrontProductDetailsPage() {
 
     toast({
       title: t("addedToCart"),
-      description: `${product.name} ${t("addedToCartDesc")}`,
+      description: `${toastDesc} ${t("addedToCartDesc")}`,
     });
   };
 
@@ -239,11 +257,11 @@ export default function StorefrontProductDetailsPage() {
           {/* Price Box */}
           <div className="p-5 bg-zinc-100/30 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/60 flex items-center gap-4">
             <span className="text-2xl font-black text-zinc-900 dark:text-white">
-              {formatCurrency(Number(product.price), store.currency)}
+              {formatCurrency(currentPrice, store.currency)}
             </span>
-            {hasDiscount && (
+            {hasDiscount && currentComparePrice && (
               <span className="text-sm font-semibold text-zinc-400 line-through">
-                {formatCurrency(Number(product.comparePrice), store.currency)}
+                {formatCurrency(currentComparePrice, store.currency)}
               </span>
             )}
           </div>
@@ -257,6 +275,53 @@ export default function StorefrontProductDetailsPage() {
               <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl whitespace-pre-line shadow-sm">
                 {product.description}
               </p>
+            </div>
+          )}
+
+          {/* Variants Selector */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="space-y-3 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm">
+              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                {isRtl ? "الخيارات المتاحة (ألوان / مقاسات):" : "Available Options (Colors / Sizes):"}
+              </h3>
+              <div className="flex flex-wrap gap-2.5">
+                {product.variants.map((v: any) => {
+                  const isSelected = selectedVariant?.id === v.id;
+                  const isOutOfStock = v.quantity <= 0;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      disabled={isOutOfStock}
+                      onClick={() => setSelectedVariant(v)}
+                      className={cn(
+                        "px-4 py-3 rounded-2xl border text-right transition-all flex flex-col gap-1 min-w-[120px] relative overflow-hidden",
+                        isSelected
+                          ? "border-brand-500 bg-brand-500/5 shadow-sm text-zinc-900 dark:text-white"
+                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                      )}
+                      style={{
+                        borderColor: isSelected ? store.primaryColor || "#6366f1" : undefined,
+                        backgroundColor: isSelected ? `${store.primaryColor || "#6366f1"}10` : undefined,
+                      }}
+                    >
+                      <span className="font-extrabold text-sm block text-zinc-900 dark:text-white">{v.name}</span>
+                      <span className="text-xs font-black block mt-0.5" style={{ color: isSelected ? store.primaryColor || "#6366f1" : undefined }}>
+                        {formatCurrency(Number(v.price), store.currency)}
+                      </span>
+                      {isOutOfStock ? (
+                        <span className="text-[10px] text-red-500 font-bold block mt-1">
+                          {isRtl ? "نفذت الكمية" : "Out of stock"}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium block mt-1">
+                          {isRtl ? `متبقي: ${v.quantity}` : `Stock: ${v.quantity}`}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 

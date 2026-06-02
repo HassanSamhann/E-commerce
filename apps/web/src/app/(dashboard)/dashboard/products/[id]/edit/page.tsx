@@ -126,27 +126,28 @@ export default function EditProductPage() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const response = await api.post("/api/media/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await api.post("/api/media/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        return response.data.url;
       });
-      const url = response.data.url;
-      setImageUrls([...imageUrls, url]);
-      toast({ title: "✅ Image uploaded successfully!" });
+      const urls = await Promise.all(uploadPromises);
+      setImageUrls((prev) => [...prev, ...urls]);
+      toast({ title: `✅ Uploaded ${urls.length} images successfully!` });
     } catch (err: any) {
-      const message = err.response?.data?.error || "Failed to upload image";
+      const message = err.response?.data?.error || "Failed to upload images";
       toast({ title: "Upload Error", description: message, variant: "destructive" });
     } finally {
       setIsUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -377,6 +378,7 @@ export default function EditProductPage() {
               <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-brand-500 transition-colors relative cursor-pointer group">
                 <input
                   type="file"
+                  multiple
                   accept="image/*"
                   onChange={handleFileUpload}
                   disabled={isUploading}

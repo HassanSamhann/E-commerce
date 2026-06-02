@@ -3,7 +3,10 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface CartItem {
-  id: string;
+  id: string; // unique item id: either product.id or `${product.id}-${variant.id}`
+  productId: string;
+  variantId?: string;
+  variantName?: string;
   name: string;
   price: number;
   quantity: number;

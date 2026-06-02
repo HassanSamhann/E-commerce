@@ -100,7 +100,8 @@ export default function CheckoutPage() {
           phone: formData.phone,
         },
         items: cartItems.map((item) => ({
-          productId: item.id,
+          productId: item.productId,
+          variantId: item.variantId,
           quantity: item.quantity,
         })),
         shippingAddress: {
@@ -442,6 +443,13 @@ export default function CheckoutPage() {
                     <h4 className="text-xs font-bold text-zinc-800 dark:text-white line-clamp-1">
                       {item.name}
                     </h4>
+                    {item.variantName && (
+                      <div className="mt-0.5">
+                        <span className="inline-block px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800/50">
+                          {item.variantName}
+                        </span>
+                      </div>
+                    )}
                     <p className="text-[11px] text-zinc-400 mt-0.5">
                       {isRtl ? "الكمية" : "Quantity"}: {item.quantity}
                     </p>

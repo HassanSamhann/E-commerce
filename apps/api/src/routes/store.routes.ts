@@ -129,19 +129,37 @@ router.post("/:slug/orders", async (req: Request, res: Response, next: NextFunct
     const productIds = items.map((i: { productId: string }) => i.productId);
     const products = await prisma.product.findMany({
       where: { id: { in: productIds }, tenantId: tenant.id, status: "ACTIVE" },
+      include: { variants: true },
     });
 
     let subtotal = 0;
     const orderItems = items.map((item: { productId: string; quantity: number; variantId?: string }) => {
       const product = products.find((p: any) => p.id === item.productId);
       if (!product) throw new Error(`Product ${item.productId} not found`);
-      const itemTotal = Number(product.price) * item.quantity;
+      
+      let price = Number(product.price);
+      let name = product.name;
+      let sku = product.sku;
+
+      if (item.variantId) {
+        const variant = product.variants.find((v: any) => v.id === item.variantId);
+        if (variant) {
+          price = Number(variant.price);
+          name = `${product.name} (${variant.name})`;
+          if (variant.sku) {
+            sku = variant.sku;
+          }
+        }
+      }
+
+      const itemTotal = price * item.quantity;
       subtotal += itemTotal;
       return {
         productId: product.id,
-        variantId: item.variantId,
-        name: product.name,
-        price: product.price,
+        variantId: item.variantId || null,
+        name,
+        sku,
+        price,
         quantity: item.quantity,
         total: itemTotal,
       };
@@ -203,6 +221,7 @@ router.get("/:slug/products/:id", async (req: Request, res: Response, next: Next
         price: true, comparePrice: true, quantity: true, tags: true,
         category: { select: { id: true, name: true } },
         images: { orderBy: { sortOrder: "asc" } },
+        variants: true,
       },
     });
 

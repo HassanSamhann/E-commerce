@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const [inviteRole, setInviteRole] = useState("STAFF");
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,6 +43,7 @@ export default function SettingsPage() {
       toast({ title: "Upload Error", description: msg, variant: "destructive" });
     } finally {
       setIsUploadingLogo(false);
+      e.target.value = "";
     }
   };
 
@@ -66,6 +69,7 @@ export default function SettingsPage() {
       toast({ title: "Upload Error", description: msg, variant: "destructive" });
     } finally {
       setIsUploadingCover(false);
+      e.target.value = "";
     }
   };
 
@@ -86,7 +90,10 @@ export default function SettingsPage() {
       queryClient.invalidateQueries({ queryKey: ["tenant"] });
       toast({ title: "✅ Settings saved!" });
     },
-    onError: () => toast({ title: "Failed to save", variant: "destructive" }),
+    onError: (err: any) => {
+      const message = err.response?.data?.error || "Failed to save settings";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    },
   });
 
   const inviteMutation = useMutation({
@@ -247,13 +254,16 @@ export default function SettingsPage() {
                       <div className="relative cursor-pointer inline-block">
                         <input
                           type="file"
+                          ref={logoInputRef}
                           accept="image/*"
                           onChange={handleLogoUpload}
                           disabled={isUploadingLogo}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          className="hidden"
                         />
                         <button
                           type="button"
+                          onClick={() => logoInputRef.current?.click()}
+                          disabled={isUploadingLogo}
                           className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 border border-slate-250 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
                         >
                           Upload Logo
@@ -282,13 +292,16 @@ export default function SettingsPage() {
                       <div className="relative cursor-pointer inline-block">
                         <input
                           type="file"
+                          ref={coverInputRef}
                           accept="image/*"
                           onChange={handleCoverUpload}
                           disabled={isUploadingCover}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          className="hidden"
                         />
                         <button
                           type="button"
+                          onClick={() => coverInputRef.current?.click()}
+                          disabled={isUploadingCover}
                           className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 border border-slate-250 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
                         >
                           Upload Cover

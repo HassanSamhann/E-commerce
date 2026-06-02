@@ -469,6 +469,13 @@ function StorefrontNavbar({ store, isCartOpen, setIsCartOpen }: { store: any; is
                         <h4 className="text-sm font-semibold text-zinc-800 dark:text-white line-clamp-1">
                           {item.name}
                         </h4>
+                        {item.variantName && (
+                          <div className="mt-0.5">
+                            <span className="inline-block px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800/50">
+                              {item.variantName}
+                            </span>
+                          </div>
+                        )}
                         <p className="text-sm font-black mt-0.5" style={{ color: store.primaryColor || taagerTeal }}>
                           {formatCurrency(item.price, store.currency)}
                         </p>
