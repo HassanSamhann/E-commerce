@@ -10,7 +10,7 @@ router.get("/:slug", async (req: Request, res: Response, next: NextFunction) => 
       where: { slug: req.params.slug, isActive: true },
       select: {
         id: true, name: true, slug: true, description: true,
-        logoUrl: true, coverUrl: true, primaryColor: true,
+        logoUrl: true, coverUrl: true, primaryColor: true, theme: true,
         currency: true, email: true, phone: true,
         categories: {
           where: { isActive: true, parentId: null },

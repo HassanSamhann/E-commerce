@@ -117,6 +117,7 @@ model Tenant {
   country         String   @default("EG")
   currency        String   @default("EGP")
   primaryColor    String   @default("#6366f1")
+  theme           String   @default("classic")
   domain          String?  @unique
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())

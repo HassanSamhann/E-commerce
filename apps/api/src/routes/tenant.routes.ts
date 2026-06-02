@@ -47,7 +47,7 @@ router.put(
 
       const {
         name, description, email, phone, address,
-        city, country, currency, primaryColor, logoUrl, coverUrl,
+        city, country, currency, primaryColor, logoUrl, coverUrl, theme,
       } = req.body;
 
       const tenant = await prisma.tenant.update({
@@ -64,6 +64,7 @@ router.put(
           ...(primaryColor && { primaryColor }),
           ...(logoUrl !== undefined && { logoUrl }),
           ...(coverUrl !== undefined && { coverUrl }),
+          ...(theme && { theme }),
         },
       });
 
