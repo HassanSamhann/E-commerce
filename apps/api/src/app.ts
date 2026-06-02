@@ -59,6 +59,7 @@ const corsOptions: cors.CorsOptions = {
     "Accept",
     "Origin",
     "x-tenant-id",
+    "x-tenant-slug",
   ],
   exposedHeaders: ["Content-Length", "Content-Type"],
   optionsSuccessStatus: 200,
