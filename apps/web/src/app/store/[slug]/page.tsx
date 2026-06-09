@@ -22,6 +22,7 @@ export default function StorefrontPage() {
 
   const [search, setSearch] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const catId = searchParams.get("categoryId");
   const searchQuery = searchParams.get("search") || "";
@@ -30,6 +31,11 @@ export default function StorefrontPage() {
     setSelectedCategoryId(catId);
     setSearch(searchQuery);
   }, [catId, searchQuery]);
+
+  // Reset page when category or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategoryId, search]);
 
   // Fetch store details (reads from React Query cache instantly)
   const { data: store, isLoading: isStoreLoading } = useQuery({
@@ -40,13 +46,15 @@ export default function StorefrontPage() {
 
   // Fetch products
   const { data: productsData, isLoading: isProductsLoading } = useQuery({
-    queryKey: ["store-products", slug, search, selectedCategoryId],
+    queryKey: ["store-products", slug, search, selectedCategoryId, page],
     queryFn: () =>
       api
         .get(`/api/store/${slug}/products`, {
           params: {
             search,
             categoryId: selectedCategoryId || undefined,
+            page,
+            limit: 30,
           },
         })
         .then((r) => r.data),
@@ -54,6 +62,7 @@ export default function StorefrontPage() {
   });
 
   const products = productsData?.products || [];
+  const pagination = productsData?.pagination;
   const isLoading = isStoreLoading || isProductsLoading;
 
   if (isStoreLoading || !store) {
@@ -290,135 +299,229 @@ export default function StorefrontPage() {
           </motion.div>
         ) : (
           // Products Grid
-          <motion.div
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
-            <AnimatePresence mode="popLayout">
-              {products.map((product: any, index: number) => {
-                const hasDiscount = product.comparePrice && Number(product.comparePrice) > Number(product.price);
-                const discountPercent = hasDiscount
-                  ? Math.round(
-                      ((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100
-                    )
-                  : 0;
+          <div className="space-y-8">
+            <motion.div
+              layout
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              <AnimatePresence mode="popLayout">
+                {products.map((product: any, index: number) => {
+                  const hasDiscount = product.comparePrice && Number(product.comparePrice) > Number(product.price);
+                  const discountPercent = hasDiscount
+                    ? Math.round(
+                        ((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100
+                      )
+                    : 0;
 
-                const inCart = isProductInCart(product.id);
-                const outOfStock = product.quantity <= 0;
+                  const inCart = isProductInCart(product.id);
+                  const outOfStock = product.quantity <= 0;
 
-                return (
-                  <motion.div
-                    layout
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-[24px] overflow-hidden p-4 flex flex-col justify-between shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 transition-all duration-300 relative"
-                  >
-                    {/* Link to details page wrapping Image & Metadata */}
-                    <Link href={`/store/${slug}/products/${product.id}`} className="flex-1 flex flex-col group cursor-pointer">
-                      
-                      {/* Image / Gallery */}
-                      <div className="relative h-52 w-full rounded-[18px] overflow-hidden bg-zinc-55 dark:bg-zinc-900/40 mb-4 border border-zinc-200/80 dark:border-zinc-800/60">
-                        {product.images?.[0]?.url ? (
-                          <img
-                            src={product.images[0].url}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50">
-                            <Package className="w-12 h-12 stroke-[1.25]" />
-                          </div>
-                        )}
-
-                        {/* Featured & Discount Badges */}
-                        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
-                          {discountPercent > 0 && (
-                            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-red-500/20">
-                              {language === "ar" ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`}
-                            </span>
+                  return (
+                    <motion.div
+                      layout
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="group bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-[24px] overflow-hidden p-4 flex flex-col justify-between shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 transition-all duration-300 relative"
+                    >
+                      {/* Link to details page wrapping Image & Metadata */}
+                      <Link href={`/store/${slug}/products/${product.id}`} className="flex-1 flex flex-col group cursor-pointer">
+                        
+                        {/* Image / Gallery */}
+                        <div className="relative h-52 w-full rounded-[18px] overflow-hidden bg-zinc-55 dark:bg-zinc-900/40 mb-4 border border-zinc-200/80 dark:border-zinc-800/60">
+                          {product.images?.[0]?.url ? (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50">
+                              <Package className="w-12 h-12 stroke-[1.25]" />
+                            </div>
                           )}
-                          {product.isFeatured && (
-                            <span
-                              className="text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-indigo-500/20"
-                              style={{ backgroundColor: store.primaryColor || taagerTeal }}
-                            >
-                              {t("featured")}
-                            </span>
+
+                          {/* Featured & Discount Badges */}
+                          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
+                            {discountPercent > 0 && (
+                              <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-red-500/20">
+                                {language === "ar" ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`}
+                              </span>
+                            )}
+                            {product.isFeatured && (
+                              <span
+                                className="text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md shadow-indigo-500/20"
+                                style={{ backgroundColor: store.primaryColor || taagerTeal }}
+                              >
+                                {t("featured")}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Stock badge */}
+                          {outOfStock && (
+                            <div className="absolute inset-0 bg-white/75 dark:bg-zinc-900/75 backdrop-blur-[2px] flex items-center justify-center z-10">
+                              <span className="bg-zinc-900 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-lg border border-white/10">
+                                {t("outOfStock")}
+                              </span>
+                            </div>
                           )}
                         </div>
 
-                        {/* Stock badge */}
-                        {outOfStock && (
-                          <div className="absolute inset-0 bg-white/75 dark:bg-zinc-900/75 backdrop-blur-[2px] flex items-center justify-center z-10">
-                            <span className="bg-zinc-900 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-lg border border-white/10">
-                              {t("outOfStock")}
+                        {/* Metadata */}
+                        <div className="flex-1 flex flex-col px-1.5">
+                          {product.category && (
+                            <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5 block">
+                              {product.category.name}
                             </span>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                          <h3 className="text-sm font-extrabold text-zinc-850 dark:text-white line-clamp-1 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors leading-snug">
+                            {product.name}
+                          </h3>
+                          {product.description && (
+                            <p className="text-xs text-zinc-400 dark:text-zinc-450 mt-1.5 line-clamp-2 leading-relaxed">
+                              {product.description}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
 
-                      {/* Metadata */}
-                      <div className="flex-1 flex flex-col px-1.5">
-                        {product.category && (
-                          <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5 block">
-                            {product.category.name}
+                      {/* Pricing and CTA */}
+                      <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between px-1.5">
+                        <div>
+                          {hasDiscount && (
+                            <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-555 line-through block mb-0.5">
+                              {formatCurrency(Number(product.comparePrice), store.currency)}
+                            </span>
+                          )}
+                          <span className="text-base font-black text-zinc-800 dark:text-white">
+                            {formatCurrency(Number(product.price), store.currency)}
                           </span>
-                        )}
-                        <h3 className="text-sm font-extrabold text-zinc-850 dark:text-white line-clamp-1 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors leading-snug">
-                          {product.name}
-                        </h3>
-                        {product.description && (
-                          <p className="text-xs text-zinc-400 dark:text-zinc-450 mt-1.5 line-clamp-2 leading-relaxed">
-                            {product.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
+                        </div>
 
-                    {/* Pricing and CTA */}
-                    <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between px-1.5">
-                      <div>
-                        {hasDiscount && (
-                          <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-555 line-through block mb-0.5">
-                            {formatCurrency(Number(product.comparePrice), store.currency)}
+                        <button
+                          disabled={outOfStock}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAddToCart(product);
+                          }}
+                          className={cn(
+                            "px-4.5 py-2 rounded-xl text-white text-xs font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center gap-1 hover:scale-105 active:scale-95"
+                          )}
+                          style={{
+                            backgroundColor: outOfStock
+                              ? "#cbd5e1"
+                              : inCart
+                              ? "#10b981"
+                              : store.primaryColor || taagerTeal,
+                          }}
+                        >
+                          {inCart ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                          <span>{inCart ? (isRtl ? "مضاف" : "Added") : (isRtl ? "شراء" : "Buy")}</span>
+                        </button>
+                      </div>
+
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Pagination UI */}
+            {pagination && pagination.pages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-200/80 dark:border-zinc-800 pt-6 mt-8" dir={isRtl ? "rtl" : "ltr"}>
+                <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                  {isRtl
+                    ? `عرض ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(
+                        pagination.page * pagination.limit,
+                        pagination.total
+                      )} من أصل ${pagination.total} منتج`
+                    : `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(
+                        pagination.page * pagination.limit,
+                        pagination.total
+                      )} of ${pagination.total} products`}
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      setPage((p) => Math.max(1, p - 1));
+                      const el = document.getElementById("catalog-section");
+                      el?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    disabled={page === 1}
+                    className="px-3.5 py-2 rounded-xl text-xs font-black border border-zinc-200 dark:border-zinc-800 disabled:opacity-40 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all cursor-pointer flex items-center gap-1 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300"
+                  >
+                    {isRtl ? <ArrowRight className="w-3.5 h-3.5" /> : <ArrowLeft className="w-3.5 h-3.5" />}
+                    <span>{isRtl ? "السابق" : "Previous"}</span>
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  {(() => {
+                    const getPageNumbers = (current: number, total: number) => {
+                      if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+                      const pages: (number | string)[] = [];
+                      if (current <= 3) {
+                        pages.push(1, 2, 3, "...", total);
+                      } else if (current >= total - 2) {
+                        pages.push(1, "...", total - 2, total - 1, total);
+                      } else {
+                        pages.push(1, "...", current - 1, current, current + 1, "...", total);
+                      }
+                      return pages;
+                    };
+
+                    return getPageNumbers(page, pagination.pages).map((pageNum, idx) => {
+                      if (pageNum === "...") {
+                        return (
+                          <span key={`dots-${idx}`} className="w-9 h-9 flex items-center justify-center text-xs font-black text-zinc-400">
+                            ...
                           </span>
-                        )}
-                        <span className="text-base font-black text-zinc-800 dark:text-white">
-                          {formatCurrency(Number(product.price), store.currency)}
-                        </span>
-                      </div>
+                        );
+                      }
+                      const isCurrent = pageNum === page;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => {
+                            setPage(pageNum as number);
+                            const el = document.getElementById("catalog-section");
+                            el?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className={cn(
+                            "w-9 h-9 rounded-xl text-xs font-black flex items-center justify-center transition-all cursor-pointer",
+                            isCurrent
+                              ? "text-white shadow-md shadow-brand-500/10"
+                              : "bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-750 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                          )}
+                          style={{
+                            backgroundColor: isCurrent ? store.primaryColor || taagerTeal : undefined,
+                          }}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    });
+                  })()}
 
-                      <button
-                        disabled={outOfStock}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleAddToCart(product);
-                        }}
-                        className={cn(
-                          "px-4.5 py-2 rounded-xl text-white text-xs font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center gap-1 hover:scale-105 active:scale-95"
-                        )}
-                        style={{
-                          backgroundColor: outOfStock
-                            ? "#cbd5e1"
-                            : inCart
-                            ? "#10b981"
-                            : store.primaryColor || taagerTeal,
-                        }}
-                      >
-                        {inCart ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                        <span>{inCart ? (isRtl ? "مضاف" : "Added") : (isRtl ? "شراء" : "Buy")}</span>
-                      </button>
-                    </div>
-
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+                  <button
+                    onClick={() => {
+                      setPage((p) => Math.min(pagination.pages, p + 1));
+                      const el = document.getElementById("catalog-section");
+                      el?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    disabled={page === pagination.pages}
+                    className="px-3.5 py-2 rounded-xl text-xs font-black border border-zinc-200 dark:border-zinc-800 disabled:opacity-40 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all cursor-pointer flex items-center gap-1 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300"
+                  >
+                    <span>{isRtl ? "التالي" : "Next"}</span>
+                    {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

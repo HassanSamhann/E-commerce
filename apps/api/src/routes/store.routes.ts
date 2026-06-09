@@ -52,7 +52,7 @@ router.get("/:slug/products", async (req: Request, res: Response, next: NextFunc
       return;
     }
 
-    const { page = "1", limit = "20", search = "", categoryId } = req.query as Record<string, string>;
+    const { page = "1", limit = "30", search = "", categoryId } = req.query as Record<string, string>;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where: Record<string, unknown> = {
