@@ -3,22 +3,24 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  ShoppingBag,
-  ArrowLeft,
-  ArrowRight,
-  Loader2,
-  Check,
-  Plus,
-  Minus,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
-} from "lucide-react";
+  faBagShopping,
+  faArrowLeft,
+  faArrowRight,
+  faCircleNotch,
+  faCheck,
+  faPlus,
+  faMinus,
+  faShieldHalved,
+  faTruckFast,
+  faRotateLeft,
+  faBoxArchive,
+} from "@fortawesome/free-solid-svg-icons";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import { api } from "@/lib/api";
 import { useCart } from "@/contexts/cart.context";
 import { formatCurrency, cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/language.context";
 import Link from "next/link";
@@ -36,14 +38,12 @@ export default function StorefrontProductDetailsPage() {
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
-  // Fetch store details (reads from React Query cache instantly)
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", slug],
     queryFn: () => api.get(`/api/store/${slug}`).then((r) => r.data.store),
     enabled: !!slug,
   });
 
-  // Fetch product details
   const { data: productData, isLoading: isProductLoading } = useQuery({
     queryKey: ["store-product", id],
     queryFn: () => api.get(`/api/store/${slug}/products/${id}`).then((r) => r.data.product),
@@ -57,52 +57,21 @@ export default function StorefrontProductDetailsPage() {
       setSelectedVariant((prev: any) => prev || product.variants[0]);
     }
   }, [product]);
+
   const isLoading = isStoreLoading || isProductLoading;
 
   if (isLoading || !store) {
     return (
-      <div className="space-y-8 animate-pulse bg-zinc-50 dark:bg-black p-6 rounded-3xl" dir={isRtl ? "rtl" : "ltr"}>
-        {/* Breadcrumb Navigation Shimmer */}
-        <div className="h-4 w-32 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-
+      <div className="space-y-8 animate-pulse p-6 apple-card" dir={isRtl ? "rtl" : "ltr"}>
+        <div className="h-4 w-32 bg-black/[0.06] dark:bg-white/[0.06] rounded-full" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Left Column: Image Shimmer */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="rounded-[28px] aspect-square bg-zinc-200 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800/60 shadow-sm" />
-            <div className="flex gap-3">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="w-20 h-20 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex-shrink-0" />
-              ))}
-            </div>
+            <div className="rounded-[24px] aspect-square bg-black/[0.04] dark:bg-white/[0.04]" />
           </div>
-
-          {/* Right Column: Meta Shimmer */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="space-y-2">
-              <div className="h-3.5 w-20 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-              <div className="h-9 w-3/4 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
-            </div>
-
-            {/* Price box Shimmer */}
-            <div className="h-16 w-1/2 bg-zinc-200 dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-800/60" />
-
-            {/* Description Shimmer */}
-            <div className="space-y-2">
-              <div className="h-3.5 w-24 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-              <div className="h-32 w-full bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
-            </div>
-
-            {/* Actions Shimmer */}
-            <div className="space-y-4 pt-2">
-              <div className="flex items-center gap-3">
-                <div className="h-3 w-16 bg-zinc-200 dark:bg-zinc-800 rounded-lg" />
-                <div className="h-10 w-28 bg-zinc-200 dark:bg-zinc-800 rounded-xl" />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="h-14 flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
-                <div className="h-14 flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-2xl" />
-              </div>
-            </div>
+            <div className="h-4 w-20 bg-black/[0.04] dark:bg-white/[0.04] rounded-full" />
+            <div className="h-8 w-3/4 bg-black/[0.04] dark:bg-white/[0.04] rounded-xl" />
+            <div className="h-12 w-1/3 bg-black/[0.04] dark:bg-white/[0.04] rounded-xl" />
           </div>
         </div>
       </div>
@@ -112,21 +81,21 @@ export default function StorefrontProductDetailsPage() {
   if (!product || !store) {
     return (
       <div className="max-w-md mx-auto text-center py-20 px-4">
-        <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8 text-red-500" />
+        <div className="w-14 h-14 rounded-full bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center mx-auto mb-4 text-rose-500">
+          <FontAwesomeIcon icon={faBoxArchive} className="w-6 h-6" />
         </div>
-        <h2 className="text-lg font-bold text-zinc-800 dark:text-white">
-          {isRtl ? "المنتج غير موجود" : "Product Not Found"}
+        <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-white">
+          {isRtl ? "المنتج غير متوفر" : "Product Not Found"}
         </h2>
-        <p className="text-sm text-zinc-400 mt-2">
-          {isRtl ? "قد يكون تم حذف المنتج أو نقله بواسطة التاجر." : "The product you are looking for does not exist or has been removed."}
+        <p className="text-xs text-[#86868b] mt-1.5">
+          {isRtl ? "قد يكون تم حذف المنتج أو نقله." : "The product you are looking for does not exist or has been removed."}
         </p>
         <Link
           href={`/store/${slug}`}
-          className="inline-flex items-center gap-2 mt-6 py-2.5 px-5 text-white text-sm font-bold rounded-xl shadow-md transition-colors"
-          style={{ backgroundColor: store.primaryColor || "#6366f1" }}
+          className="btn-apple-primary text-xs mt-6 inline-flex"
         >
-          {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t("backToStore")}
+          <FontAwesomeIcon icon={isRtl ? faArrowRight : faArrowLeft} className="w-3 h-3" />
+          <span>{t("backToStore")}</span>
         </Link>
       </div>
     );
@@ -176,37 +145,37 @@ export default function StorefrontProductDetailsPage() {
       <div>
         <Link
           href={`/store/${slug}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-[#86868b] hover:text-[#0066cc] dark:hover:text-[#2997ff] transition-colors"
         >
-          {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {isRtl ? "العودة لكتالوج المنتجات" : "Back to Catalog"}
+          <FontAwesomeIcon icon={isRtl ? faArrowRight : faArrowLeft} className="w-3 h-3" />
+          <span>{isRtl ? "العودة لكتالوج المنتجات" : "Back to Catalog"}</span>
         </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Left Column: Image Gallery */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative rounded-3xl overflow-hidden aspect-square bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 flex items-center justify-center shadow-sm">
+          <div className="relative rounded-[24px] overflow-hidden aspect-square bg-white dark:bg-[#1d1d1f] border border-black/[0.06] dark:border-white/[0.08] flex items-center justify-center shadow-apple-card">
             {product.images?.[activeImageIdx]?.url ? (
               <img
                 src={product.images[activeImageIdx].url}
                 alt={product.name}
-                className="w-full h-full object-contain animate-fade-in"
+                className="w-full h-full object-contain p-4"
               />
             ) : (
-              <ShoppingBag className="w-20 h-20 text-zinc-300 stroke-[1.25]" />
+              <FontAwesomeIcon icon={faBoxArchive} className="w-16 h-16 text-[#86868b] opacity-30" />
             )}
 
-            {/* Discount Badge */}
+            {/* Badges */}
             {discountPercent > 0 && !outOfStock && (
-              <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md z-10">
+              <span className="absolute top-4 left-4 badge-apple-red text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
                 {isRtl ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`}
               </span>
             )}
 
-            {/* Out of Stock overlay */}
             {outOfStock && (
-              <div className="absolute inset-0 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-[1px] flex items-center justify-center z-10">
-                <span className="bg-zinc-900 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg">
+              <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-10">
+                <span className="px-4 py-1.5 rounded-full bg-[#1d1d1f] text-white text-xs font-semibold">
                   {t("outOfStock")}
                 </span>
               </div>
@@ -215,19 +184,16 @@ export default function StorefrontProductDetailsPage() {
 
           {/* Thumbnail strip */}
           {product.images && product.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-1 max-w-full no-scrollbar">
+            <div className="flex gap-2.5 overflow-x-auto pb-1 max-w-full no-scrollbar">
               {product.images.map((img: any, idx: number) => (
                 <button
                   key={img.id}
                   onClick={() => setActiveImageIdx(idx)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 bg-white dark:bg-zinc-950 flex-shrink-0 transition-all ${
+                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 bg-white dark:bg-[#1d1d1f] flex-shrink-0 transition-all ${
                     activeImageIdx === idx
-                      ? "border-brand-500 shadow-sm"
-                      : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                      ? "border-[#0066cc] dark:border-[#2997ff]"
+                      : "border-black/[0.06] dark:border-white/[0.08]"
                   }`}
-                  style={{
-                    borderColor: activeImageIdx === idx ? store.primaryColor || "#6366f1" : undefined,
-                  }}
                 >
                   <img src={img.url} alt="" className="w-full h-full object-cover" />
                 </button>
@@ -238,29 +204,29 @@ export default function StorefrontProductDetailsPage() {
 
         {/* Right Column: Meta & Actions */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {product.quantity > 0 && product.quantity < 10 && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-black animate-pulse border border-amber-500/20 shadow-sm shadow-amber-500/5 mb-2">
-                <span>🔥 {isRtl ? `عاجل: متبقي ${product.quantity} قطع فقط في المخزن!` : `Hurry up: Only ${product.quantity} items left in stock!`}</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full badge-apple-amber text-xs font-semibold mb-2">
+                <span>{isRtl ? `متبقي ${product.quantity} قطع فقط في المخزن!` : `Only ${product.quantity} items left in stock!`}</span>
               </div>
             )}
             {product.category && (
-              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest block">
+              <span className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wider block">
                 {product.category.name}
               </span>
             )}
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
               {product.name}
             </h1>
           </div>
 
           {/* Price Box */}
-          <div className="p-5 bg-zinc-100/30 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/60 flex items-center gap-4">
-            <span className="text-2xl font-black text-zinc-900 dark:text-white">
+          <div className="p-4 apple-card flex items-center gap-3">
+            <span className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
               {formatCurrency(currentPrice, store.currency)}
             </span>
             {hasDiscount && currentComparePrice && (
-              <span className="text-sm font-semibold text-zinc-400 line-through">
+              <span className="text-sm font-medium text-[#86868b] line-through">
                 {formatCurrency(currentComparePrice, store.currency)}
               </span>
             )}
@@ -269,22 +235,22 @@ export default function StorefrontProductDetailsPage() {
           {/* Description */}
           {product.description && (
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                {isRtl ? "الوصف والتفاصيل" : "Description"}
+              <h3 className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+                {isRtl ? "التفاصيل والمواصفات" : "Details"}
               </h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl whitespace-pre-line shadow-sm">
+              <p className="text-xs sm:text-sm text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed apple-card p-4 whitespace-pre-line">
                 {product.description}
               </p>
             </div>
           )}
 
-          {/* Variants Selector */}
+          {/* Variants */}
           {product.variants && product.variants.length > 0 && (
-            <div className="space-y-3 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                {isRtl ? "الخيارات المتاحة (ألوان / مقاسات):" : "Available Options (Colors / Sizes):"}
+            <div className="space-y-3 apple-card p-4">
+              <h3 className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">
+                {isRtl ? "الخيارات المتاحة:" : "Available Variants:"}
               </h3>
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap gap-2">
                 {product.variants.map((v: any) => {
                   const isSelected = selectedVariant?.id === v.id;
                   const isOutOfStock = v.quantity <= 0;
@@ -295,29 +261,15 @@ export default function StorefrontProductDetailsPage() {
                       disabled={isOutOfStock}
                       onClick={() => setSelectedVariant(v)}
                       className={cn(
-                        "px-4 py-3 rounded-2xl border text-right transition-all flex flex-col gap-1 min-w-[120px] relative overflow-hidden",
+                        "px-3.5 py-2 rounded-full border text-xs font-semibold transition-all flex items-center gap-2",
                         isSelected
-                          ? "border-brand-500 bg-brand-500/5 shadow-sm text-zinc-900 dark:text-white"
-                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                          ? "border-[#0066cc] bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff]"
+                          : "border-black/[0.08] dark:border-white/[0.12] bg-[#f5f5f7] dark:bg-[#272729] text-[#1d1d1f] dark:text-white hover:border-black/[0.2] disabled:opacity-40 disabled:cursor-not-allowed"
                       )}
-                      style={{
-                        borderColor: isSelected ? store.primaryColor || "#6366f1" : undefined,
-                        backgroundColor: isSelected ? `${store.primaryColor || "#6366f1"}10` : undefined,
-                      }}
                     >
-                      <span className="font-extrabold text-sm block text-zinc-900 dark:text-white">{v.name}</span>
-                      <span className="text-xs font-black block mt-0.5" style={{ color: isSelected ? store.primaryColor || "#6366f1" : undefined }}>
-                        {formatCurrency(Number(v.price), store.currency)}
-                      </span>
-                      {isOutOfStock ? (
-                        <span className="text-[10px] text-red-500 font-bold block mt-1">
-                          {isRtl ? "نفذت الكمية" : "Out of stock"}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium block mt-1">
-                          {isRtl ? `متبقي: ${v.quantity}` : `Stock: ${v.quantity}`}
-                        </span>
-                      )}
+                      <span>{v.name}</span>
+                      <span className="opacity-75 font-normal">({formatCurrency(Number(v.price), store.currency)})</span>
+                      {isOutOfStock && <span className="text-rose-500 text-[10px]">{isRtl ? "نفذت" : "Sold out"}</span>}
                     </button>
                   );
                 })}
@@ -325,41 +277,40 @@ export default function StorefrontProductDetailsPage() {
             </div>
           )}
 
-          {/* Quantity and Cart buttons */}
+          {/* Quantity & Buy */}
           {!outOfStock && (
             <div className="space-y-4 pt-2">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                  {isRtl ? "الكمية المطلوبة:" : "Quantity:"}
+                <span className="text-xs font-semibold text-[#86868b]">
+                  {isRtl ? "الكمية:" : "Quantity:"}
                 </span>
-                <div className="flex items-center gap-3 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 shadow-sm">
+                <div className="flex items-center gap-2 bg-[#f5f5f7] dark:bg-[#272729] rounded-full px-3 py-1 border border-black/[0.06] dark:border-white/[0.08]">
                   <button
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 transition-colors disabled:opacity-40"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[#86868b] hover:text-[#1d1d1f] disabled:opacity-40"
                   >
-                    <Minus className="w-3.5 h-3.5" />
+                    <FontAwesomeIcon icon={faMinus} className="w-2.5 h-2.5" />
                   </button>
-                  <span className="text-sm font-bold w-6 text-center text-zinc-800 dark:text-white">
+                  <span className="text-xs font-semibold w-6 text-center text-[#1d1d1f] dark:text-white">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500 transition-colors"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[#86868b] hover:text-[#1d1d1f]"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <FontAwesomeIcon icon={faPlus} className="w-2.5 h-2.5" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 py-4 px-6 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg hover:opacity-95 shadow-indigo-500/10 hover:scale-[1.01] active:scale-[0.99] duration-150"
-                  style={{ backgroundColor: store.primaryColor || "#6366f1" }}
+                  className="btn-apple-primary flex-1 py-3 text-xs justify-center"
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  {isRtl ? "إضافة لسلة المشتريات" : "Add to Shopping Cart"}
+                  <FontAwesomeIcon icon={faBagShopping} className="w-3.5 h-3.5" />
+                  <span>{isRtl ? "إضافة لحقيبة التسوق" : "Add to Shopping Bag"}</span>
                 </button>
 
                 {store.phone && (
@@ -371,47 +322,37 @@ export default function StorefrontProductDetailsPage() {
                       return "20" + cleaned;
                     })()}?text=${encodeURIComponent(
                       isRtl
-                        ? `مرحباً، أود طلب منتج: ${product.name}\nبسعر: ${formatCurrency(product.price, store.currency)}\nالكمية: ${quantity}\nرابط المنتج: ${typeof window !== "undefined" ? window.location.href : ""}`
-                        : `Hello, I want to order: ${product.name}\nPrice: ${formatCurrency(product.price, store.currency)}\nQuantity: ${quantity}\nLink: ${typeof window !== "undefined" ? window.location.href : ""}`
+                        ? `مرحباً، أود طلب منتج: ${product.name}\nالسعر: ${formatCurrency(product.price, store.currency)}\nالكمية: ${quantity}`
+                        : `Hello, I would like to order: ${product.name}\nPrice: ${formatCurrency(product.price, store.currency)}\nQuantity: ${quantity}`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/15 hover:scale-[1.01] active:scale-[0.99] duration-150 text-center"
+                    className="flex-1 py-3 px-5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 text-center"
                   >
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-white">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 1.981 14.113.975 11.488.975c-5.442 0-9.866 4.372-9.87 9.802 0 1.698.48 3.35 1.387 4.825L1.97 21.03l5.677-1.876zm13.125-9.351c-.322-.16-.1.21-.83-.16-.403-.201-2.39-1.177-2.761-1.31-.37-.134-.64-.201-.91.201-.27.402-1.042 1.31-1.277 1.578-.235.268-.47.301-.79.141-.322-.16-1.362-.501-2.594-1.599-.958-.853-1.602-1.908-1.79-2.22-.19-.311-.02-.48.14-.64.14-.14.32-.37.48-.56.16-.18.21-.31.32-.51.11-.2.05-.38-.03-.54-.08-.16-.91-2.206-1.246-3.009-.329-.787-.663-.681-.912-.693-.235-.011-.504-.014-.772-.014-.27 0-.71.1-1.08.5-.37.4-1.41 1.38-1.41 3.367s1.44 3.9 1.64 4.168c.2.268 2.83 4.302 6.85 6.043 4.02 1.741 4.02 1.16 4.75 1.08.73-.08 2.39-.974 2.72-1.916.33-.942.33-1.751.23-1.918-.1-.168-.37-.268-.69-.428z" />
-                    </svg>
-                    <span>{isRtl ? "طلب مباشر عبر واتساب" : "Direct WhatsApp Order"}</span>
+                    <FontAwesomeIcon icon={faWhatsapp} className="w-4 h-4" />
+                    <span>{isRtl ? "طلب مباشر بالواتساب" : "Direct WhatsApp Order"}</span>
                   </a>
                 )}
               </div>
             </div>
           )}
 
-          {/* Trust Badges */}
-          <div className="grid grid-cols-3 gap-4 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
-              <Truck className="w-5 h-5 text-emerald-500" />
-              <div>
-                <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "شحن سريع" : "Fast Delivery"}</p>
-                <p className="text-[9px] text-zinc-400 mt-0.5">{isRtl ? "لكافة المحافظات" : "To all governorates"}</p>
-              </div>
+          {/* Trust Highlights */}
+          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-black/[0.04] dark:border-white/[0.06]">
+            <div className="apple-card p-3 text-center space-y-1">
+              <FontAwesomeIcon icon={faTruckFast} className="w-4 h-4 text-[#0066cc] dark:text-[#2997ff]" />
+              <p className="text-[11px] font-semibold text-[#1d1d1f] dark:text-white">{isRtl ? "شحن سريع" : "Fast Delivery"}</p>
+              <p className="text-[10px] text-[#86868b]">{isRtl ? "لكافة المحافظات" : "Countrywide"}</p>
             </div>
-
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-500" />
-              <div>
-                <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "دفع آمن" : "Secure Payment"}</p>
-                <p className="text-[9px] text-zinc-400 mt-0.5">{isRtl ? "دفع كاش عند الاستلام" : "Cash on delivery"}</p>
-              </div>
+            <div className="apple-card p-3 text-center space-y-1">
+              <FontAwesomeIcon icon={faShieldHalved} className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <p className="text-[11px] font-semibold text-[#1d1d1f] dark:text-white">{isRtl ? "دفع آمن" : "Secure Pay"}</p>
+              <p className="text-[10px] text-[#86868b]">{isRtl ? "عند الاستلام" : "Cash on delivery"}</p>
             </div>
-
-            <div className="flex flex-col items-center text-center p-3.5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm gap-2">
-              <RotateCcw className="w-5 h-5 text-amber-500" />
-              <div>
-                <p className="text-[10px] font-bold text-zinc-800 dark:text-white">{isRtl ? "استرجاع سهل" : "Easy Return"}</p>
-                <p className="text-[9px] text-zinc-400 mt-0.5">{isRtl ? "خلال 14 يوماً" : "Within 14 days"}</p>
-              </div>
+            <div className="apple-card p-3 text-center space-y-1">
+              <FontAwesomeIcon icon={faRotateLeft} className="w-4 h-4 text-amber-500" />
+              <p className="text-[11px] font-semibold text-[#1d1d1f] dark:text-white">{isRtl ? "استرجاع سهل" : "Easy Returns"}</p>
+              <p className="text-[10px] text-[#86868b]">{isRtl ? "خلال 14 يوماً" : "Within 14 days"}</p>
             </div>
           </div>
         </div>

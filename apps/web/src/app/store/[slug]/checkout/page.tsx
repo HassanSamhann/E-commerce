@@ -2,7 +2,21 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ShoppingBag, ArrowLeft, ArrowRight, Loader2, CheckCircle, CreditCard, ChevronRight, ChevronLeft, Wallet } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBagShopping,
+  faArrowLeft,
+  faArrowRight,
+  faCircleNotch,
+  faCircleCheck,
+  faMoneyBillWave,
+  faChevronRight,
+  faChevronLeft,
+  faTruck,
+  faUser,
+  faLocationDot,
+  faReceipt,
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api";
 import { useCart } from "@/contexts/cart.context";
 import { formatCurrency } from "@/lib/utils";
@@ -52,19 +66,16 @@ export default function CheckoutPage() {
 
   const [loading, setLoading] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<any>(null);
-  const [paymentMethod] = useState("COD"); // Locked to Cash on Delivery
   const [selectedGov, setSelectedGov] = useState(GOVERNORATES[0]);
 
   const isRtl = language === "ar";
 
-  // Fetch store details (reads from React Query cache instantly)
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", slug],
     queryFn: () => api.get(`/api/store/${slug}`).then((r) => r.data.store),
     enabled: !!slug,
   });
 
-  // Form State
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -135,67 +146,61 @@ export default function CheckoutPage() {
     }
   };
 
-  // If store is loading, show loading spinner
   if (isStoreLoading || !store) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 bg-zinc-50 dark:bg-black">
-        <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-medium text-zinc-400 mt-2">
-          {isRtl ? "جاري تحميل صفحة الدفع..." : "Loading checkout..."}
+      <div className="flex flex-col items-center justify-center py-24">
+        <FontAwesomeIcon icon={faCircleNotch} className="w-8 h-8 animate-spin text-[#0066cc]" />
+        <p className="text-xs font-semibold text-[#86868b] mt-3">
+          {isRtl ? "جاري تجهيز صفحة الدفع..." : "Loading checkout..."}
         </p>
       </div>
     );
   }
 
-  // If order was successfully placed, show Confirmation Screen
   if (placedOrder) {
     return (
       <div className="max-w-xl mx-auto py-12 px-4 text-center">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 100 }}
-          className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-8 sm:p-12 shadow-xl shadow-zinc-100/50 dark:shadow-none"
+          className="apple-card p-8 sm:p-12 shadow-apple-modal space-y-4"
         >
-          <div className="flex justify-center mb-6">
-            <CheckCircle className="w-16 h-16 text-emerald-500 animate-bounce" />
+          <div className="flex justify-center mb-4 text-emerald-500">
+            <FontAwesomeIcon icon={faCircleCheck} className="w-14 h-14" />
           </div>
           
-          <h1 className="text-2xl font-extrabold text-zinc-800 dark:text-white">
+          <h1 className="text-2xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
             {t("orderConfirmed")}
           </h1>
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-xs text-[#86868b] max-w-sm mx-auto">
             {isRtl ? (
-              <>
-                شكراً لتسوقك من متجر <span className="font-semibold text-zinc-600 dark:text-zinc-200">{store.name}</span>. تم تسجيل طلبك بنجاح!
-              </>
+              <>شكراً لتسوقك من متجر <span className="font-semibold text-[#1d1d1f] dark:text-white">{store.name}</span>. تم تأكيد طلبك بنجاح وسنتواصل معك للشحن.</>
             ) : (
-              <>
-                Thank you for shopping with <span className="font-semibold text-zinc-600 dark:text-zinc-200">{store.name}</span>. Your order has been placed.
-              </>
+              <>Thank you for shopping with <span className="font-semibold text-[#1d1d1f] dark:text-white">{store.name}</span>. Your order has been placed successfully.</>
             )}
           </p>
 
-          <div className="mt-8 p-6 bg-zinc-100/30 dark:bg-zinc-900/30 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-left space-y-3" dir={isRtl ? "rtl" : "ltr"}>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400 font-medium">{t("orderNumber")}</span>
-              <span className="text-zinc-800 dark:text-white font-bold">{placedOrder.orderNumber}</span>
+          <div className="mt-6 p-5 bg-[#f5f5f7] dark:bg-[#272729] rounded-2xl border border-black/[0.04] dark:border-white/[0.06] text-left space-y-3" dir={isRtl ? "rtl" : "ltr"}>
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-[#86868b]">{t("orderNumber")}</span>
+              <span className="text-[#1d1d1f] dark:text-white font-mono">{placedOrder.orderNumber}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400 font-medium">{t("status")}</span>
-              <span className="text-amber-600 font-bold uppercase">
-                {isRtl && placedOrder.status === "PENDING" ? "في انتظار التأكيد" : placedOrder.status}
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-[#86868b]">{t("status")}</span>
+              <span className="badge-apple-amber px-2 py-0.5 rounded-full text-[10px]">
+                {isRtl && placedOrder.status === "PENDING" ? "قيد المعالجة" : placedOrder.status}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400 font-medium">{t("totalPaid")}</span>
-              <span className="text-zinc-800 dark:text-white font-extrabold">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-[#86868b]">{t("totalPaid")}</span>
+              <span className="text-[#0066cc] dark:text-[#2997ff] text-sm">
                 {formatCurrency(Number(placedOrder.total), store.currency)}
               </span>
             </div>
-            <div className="flex justify-between text-sm border-t border-zinc-200/50 dark:border-zinc-800/50 pt-3">
-              <span className="text-zinc-400 font-medium">{t("shippingTo")}</span>
-              <span className="text-zinc-700 dark:text-zinc-300 text-right truncate max-w-[200px]">
+            <div className="flex justify-between text-xs border-t border-black/[0.04] dark:border-white/[0.06] pt-3">
+              <span className="text-[#86868b]">{t("shippingTo")}</span>
+              <span className="text-[#1d1d1f] dark:text-white text-right truncate max-w-[200px]">
                 {placedOrder.shippingAddress?.address}، {placedOrder.shippingAddress?.city}
               </span>
             </div>
@@ -203,75 +208,68 @@ export default function CheckoutPage() {
 
           <Link
             href={`/store/${slug}`}
-            className="inline-flex items-center gap-2 mt-8 py-3 px-6 text-white font-bold rounded-xl shadow-lg transition-all duration-300 hover:opacity-95"
-            style={{ backgroundColor: store.primaryColor || "#6366f1" }}
+            className="btn-apple-primary text-xs mt-6 inline-flex"
           >
-            {t("continueShopping")} {isRtl ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            <span>{t("continueShopping")}</span>
+            <FontAwesomeIcon icon={isRtl ? faChevronLeft : faChevronRight} className="w-2.5 h-2.5" />
           </Link>
         </motion.div>
       </div>
     );
   }
 
-  // If cart is empty, show Empty State
   if (cartItems.length === 0) {
     return (
-      <div className="max-w-md mx-auto text-center py-16 px-4 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl mt-8">
-        <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8 text-zinc-400 opacity-60 animate-pulse" />
+      <div className="max-w-md mx-auto text-center py-16 px-4 apple-card mt-8 space-y-3">
+        <div className="w-14 h-14 rounded-full bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center mx-auto mb-2 text-[#86868b]">
+          <FontAwesomeIcon icon={faBagShopping} className="w-6 h-6 opacity-40" />
         </div>
-        <h2 className="text-lg font-bold text-zinc-800 dark:text-white">{t("cartIsEmpty")}</h2>
-        <p className="text-sm text-zinc-400 mt-2 max-w-xs mx-auto">
+        <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-white">{t("cartIsEmpty")}</h2>
+        <p className="text-xs text-[#86868b] max-w-xs mx-auto">
           {t("cartIsEmptyDesc")}
         </p>
         <Link
           href={`/store/${slug}`}
-          className="inline-flex items-center gap-2 mt-6 py-2.5 px-5 text-white text-sm font-bold rounded-xl shadow-md transition-colors"
-          style={{ backgroundColor: store.primaryColor || "#6366f1" }}
+          className="btn-apple-primary text-xs mt-4 inline-flex"
         >
-          {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t("backToStore")}
+          <FontAwesomeIcon icon={isRtl ? faArrowRight : faArrowLeft} className="w-3 h-3" />
+          <span>{t("backToStore")}</span>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 bg-zinc-50 dark:bg-black p-4 rounded-3xl">
-      <style>{`
-        .dynamic-focus-input:focus {
-          border-color: ${store.primaryColor || "#6366f1"} !important;
-          box-shadow: 0 0 0 2px ${(store.primaryColor || "#6366f1")}20 !important;
-        }
-      `}</style>
-      
-      {/* Back button */}
+    <div className="space-y-6" dir={isRtl ? "rtl" : "ltr"}>
       <div>
         <Link
           href={`/store/${slug}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-[#86868b] hover:text-[#0066cc] dark:hover:text-[#2997ff] transition-colors"
         >
-          {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t("continueShopping")}
+          <FontAwesomeIcon icon={isRtl ? faArrowRight : faArrowLeft} className="w-3 h-3" />
+          <span>{t("continueShopping")}</span>
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mt-4">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight mt-3">
           {t("checkoutSecurely")}
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form Column */}
         <div className="lg:col-span-7">
           <form
             onSubmit={handleCheckoutSubmit}
-            className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm"
+            className="apple-card space-y-6"
           >
-            <div className="space-y-4">
-              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>1</span>
-                {t("contactInfo")}
+            {/* Contact info */}
+            <div className="space-y-3.5">
+              <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2.5 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-[#0066cc] text-white text-[10px] font-bold flex items-center justify-center">1</span>
+                <span>{t("contactInfo")}</span>
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("fullName")}</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[#86868b]">{t("fullName")}</label>
                   <input
                     required
                     type="text"
@@ -279,11 +277,11 @@ export default function CheckoutPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder={t("fullNamePlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                    className="apple-input text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("phoneNumber")}</label>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[#86868b]">{t("phoneNumber")}</label>
                   <input
                     required
                     type="tel"
@@ -291,12 +289,12 @@ export default function CheckoutPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder={t("phoneNumberPlaceholder")}
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                    className="apple-input text-xs"
                   />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("emailAddress")}</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#86868b]">{t("emailAddress")}</label>
                 <input
                   required
                   type="email"
@@ -304,18 +302,19 @@ export default function CheckoutPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder={t("emailAddressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                  className="apple-input text-xs"
                 />
               </div>
             </div>
 
-            <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>2</span>
-                {t("shippingAddress")}
+            {/* Shipping address */}
+            <div className="space-y-3.5 pt-2">
+              <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2.5 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-[#0066cc] text-white text-[10px] font-bold flex items-center justify-center">2</span>
+                <span>{t("shippingAddress")}</span>
               </h2>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("addressLine")}</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#86868b]">{t("addressLine")}</label>
                 <input
                   required
                   type="text"
@@ -323,17 +322,17 @@ export default function CheckoutPage() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder={t("addressPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
+                  className="apple-input text-xs"
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("city")}</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[#86868b]">{t("city")}</label>
                   <select
                     name="city"
                     value={selectedGov.nameEn}
                     onChange={handleGovChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm font-semibold"
+                    className="apple-input text-xs"
                   >
                     {GOVERNORATES.map((gov) => (
                       <option key={gov.nameEn} value={gov.nameEn}>
@@ -342,72 +341,67 @@ export default function CheckoutPage() {
                     ))}
                   </select>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("country")}</label>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[#86868b]">{t("country")}</label>
                   <select
                     disabled
                     name="country"
                     value="EG"
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 cursor-not-allowed focus:outline-none text-sm font-semibold"
+                    className="apple-input text-xs opacity-60 cursor-not-allowed"
                   >
-                    <option value="EG">{isRtl ? "مصر فقط" : "Egypt Only"}</option>
+                    <option value="EG">{isRtl ? "مصر (Egypt)" : "Egypt Only"}</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Payment Method Selector */}
-            <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>3</span>
-                {t("paymentMethod")}
+            {/* Payment Method */}
+            <div className="space-y-3.5 pt-2">
+              <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2.5 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-[#0066cc] text-white text-[10px] font-bold flex items-center justify-center">3</span>
+                <span>{t("paymentMethod")}</span>
               </h2>
-              <div 
-                className="p-4 rounded-2xl border-2 bg-zinc-50/50 dark:bg-zinc-900/50 flex items-center gap-3 transition-all"
-                style={{ borderColor: store.primaryColor || "#6366f1" }}
-              >
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 animate-pulse">
-                  <Wallet className="w-5 h-5" />
+              <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-zinc-800 dark:text-white">{t("cashOnDelivery")}</p>
-                  <p className="text-xs text-zinc-400 mt-0.5">{isRtl ? "ادفع نقداً عند استلام شحنتك" : "Pay with cash upon delivery"}</p>
+                  <p className="text-xs font-semibold text-[#1d1d1f] dark:text-white">{t("cashOnDelivery")}</p>
+                  <p className="text-[11px] text-[#86868b] mt-0.5">{isRtl ? "الدفع نقداً عند استلام شحنتك" : "Pay with cash upon delivery"}</p>
                 </div>
               </div>
             </div>
 
-            {/* Additional Notes */}
-            <div className="space-y-4 pt-2">
-              <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: store.primaryColor || "#6366f1" }}>4</span>
-                {t("additionalNotes")}
+            {/* Notes */}
+            <div className="space-y-3.5 pt-2">
+              <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2.5 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-[#0066cc] text-white text-[10px] font-bold flex items-center justify-center">4</span>
+                <span>{t("additionalNotes")}</span>
               </h2>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{t("orderNotesOptional")}</label>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  rows={3}
-                  placeholder={t("notesPlaceholder")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dynamic-focus-input transition-all text-sm"
-                />
-              </div>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                rows={2}
+                placeholder={t("notesPlaceholder")}
+                className="apple-input text-xs resize-none"
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4.5 px-4 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: store.primaryColor || "#6366f1" }}
+              className="btn-apple-primary w-full py-3.5 text-xs justify-center shadow-md disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" /> {t("placingOrder")}
+                  <FontAwesomeIcon icon={faCircleNotch} className="w-4 h-4 animate-spin" />
+                  <span>{t("placingOrder")}</span>
                 </>
               ) : (
                 <>
-                  <Wallet className="w-5 h-5 animate-pulse" /> {t("placeOrder")} ({formatCurrency(cartTotal + selectedGov.fee, store.currency)})
+                  <FontAwesomeIcon icon={faCircleCheck} className="w-4 h-4" />
+                  <span>{t("placeOrder")} ({formatCurrency(cartTotal + selectedGov.fee, store.currency)})</span>
                 </>
               )}
             </button>
@@ -416,68 +410,68 @@ export default function CheckoutPage() {
 
         {/* Right Summary Column */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-            <h2 className="text-base font-bold text-zinc-800 dark:text-white border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between">
-              {t("orderSummary")}
-              <span className="text-xs bg-zinc-100 dark:bg-zinc-900 text-zinc-600 px-2 py-0.5 rounded-full font-bold">
+          <div className="apple-card space-y-4">
+            <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2 flex items-center justify-between">
+              <span>{t("orderSummary")}</span>
+              <span className="badge-apple-gray px-2 py-0.5 rounded-full text-[10px] font-semibold">
                 {cartItems.length} {isRtl ? "منتجات" : "items"}
               </span>
             </h2>
 
-            {/* Cart Items List */}
-            <div className="max-h-72 overflow-y-auto pr-1 space-y-4 no-scrollbar">
+            {/* Cart items */}
+            <div className="max-h-72 overflow-y-auto divide-y divide-black/[0.03] dark:divide-white/[0.04] no-scrollbar">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 py-1.5">
+                <div key={item.id} className="flex items-center gap-3.5 py-3 first:pt-0 last:pb-0">
                   {item.image ? (
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-12 h-12 rounded-xl object-cover bg-zinc-50 border border-zinc-200"
+                      className="w-12 h-12 rounded-xl object-cover bg-[#f5f5f7] border border-black/[0.04]"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-400">
-                      <ShoppingBag className="w-5 h-5" />
+                    <div className="w-12 h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center text-[#86868b]">
+                      <FontAwesomeIcon icon={faBagShopping} className="w-4 h-4" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-zinc-800 dark:text-white line-clamp-1">
+                    <h4 className="text-xs font-semibold text-[#1d1d1f] dark:text-white line-clamp-1">
                       {item.name}
                     </h4>
                     {item.variantName && (
-                      <div className="mt-0.5">
-                        <span className="inline-block px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-800/50">
-                          {item.variantName}
-                        </span>
-                      </div>
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold badge-apple-gray mt-0.5">
+                        {item.variantName}
+                      </span>
                     )}
-                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                    <p className="text-[11px] text-[#86868b] mt-0.5">
                       {isRtl ? "الكمية" : "Quantity"}: {item.quantity}
                     </p>
                   </div>
-                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                  <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white">
                     {formatCurrency(item.price * item.quantity, store.currency)}
                   </span>
                 </div>
               ))}
             </div>
 
-            {/* Breakdown */}
-            <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-3">
-              <div className="flex justify-between text-xs text-zinc-400 font-semibold">
+            {/* Financial breakdown */}
+            <div className="border-t border-black/[0.04] dark:border-white/[0.06] pt-3.5 space-y-2 text-xs">
+              <div className="flex justify-between text-[#86868b]">
                 <span>{t("subtotal")}</span>
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-[#1d1d1f] dark:text-white font-medium">
                   {formatCurrency(cartTotal, store.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-xs text-zinc-400 font-semibold">
+              <div className="flex justify-between text-[#86868b]">
                 <span>{t("shippingFee")}</span>
-                <span className="text-brand-500 font-extrabold">
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                   {formatCurrency(selectedGov.fee, store.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-zinc-800 dark:text-white font-extrabold border-t border-zinc-100 dark:border-zinc-800 pt-3">
+              <div className="flex justify-between text-sm font-semibold text-[#1d1d1f] dark:text-white border-t border-black/[0.04] dark:border-white/[0.06] pt-3">
                 <span>{t("totalAmount")}</span>
-                <span>{formatCurrency(cartTotal + selectedGov.fee, store.currency)}</span>
+                <span className="text-[#0066cc] dark:text-[#2997ff]">
+                  {formatCurrency(cartTotal + selectedGov.fee, store.currency)}
+                </span>
               </div>
             </div>
           </div>

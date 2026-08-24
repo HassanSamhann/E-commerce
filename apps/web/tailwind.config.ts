@@ -10,23 +10,57 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "SF Pro Text",
+          "SF Pro Display",
+          "Inter",
+          "system-ui",
+          "sans-serif",
+        ],
+        display: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "SF Pro Display",
+          "Inter",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       colors: {
-        brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          300: "#a5b4fc",
-          400: "#818cf8",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
-          950: "#1e1b4b",
+        // Apple Palette Tokens
+        apple: {
+          blue: "#0066cc",
+          "blue-focus": "#0071e3",
+          "blue-dark": "#2997ff",
+          ink: "#1d1d1f",
+          "ink-muted": "#86868b",
+          "ink-muted-80": "#333333",
+          "ink-muted-48": "#7a7a7a",
+          parchment: "#f5f5f7",
+          pearl: "#fafafc",
+          hairline: "#e0e0e0",
+          divider: "#f0f0f0",
+          "tile-1": "#272729",
+          "tile-2": "#2a2a2c",
+          "tile-3": "#252527",
+          black: "#000000",
         },
-        // CSS variable-based color tokens (required for border-border, bg-background etc.)
+        brand: {
+          50: "#f0f6ff",
+          100: "#e0edff",
+          200: "#bad7ff",
+          300: "#7cb7ff",
+          400: "#3690ff",
+          500: "#0066cc",
+          600: "#0052a3",
+          700: "#004182",
+          800: "#00376d",
+          900: "#062f59",
+          950: "#041e3a",
+        },
+        // Semantic Tokens
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         border: "hsl(var(--border))",
@@ -62,9 +96,17 @@ const config: Config = {
         },
       },
       borderRadius: {
+        pill: "9999px",
+        "apple-card": "18px",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "apple-product": "0 20px 40px -15px rgba(0, 0, 0, 0.22)",
+        "apple-card": "0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)",
+        "apple-card-hover": "0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)",
+        "apple-modal": "0 24px 60px rgba(0, 0, 0, 0.16)",
       },
       keyframes: {
         "accordion-down": {

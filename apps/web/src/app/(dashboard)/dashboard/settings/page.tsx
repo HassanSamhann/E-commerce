@@ -1,9 +1,26 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Loader2, Users, Plus, Trash2, UserPlus, Palette, Check, Eye, EyeOff, ExternalLink, Sparkles } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFloppyDisk,
+  faCircleNotch,
+  faUsers,
+  faPlus,
+  faTrashCan,
+  faUserPlus,
+  faPalette,
+  faCheck,
+  faEye,
+  faEyeSlash,
+  faArrowUpRightFromSquare,
+  faSparkles,
+  faStore,
+  faUpload,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth.context";
@@ -32,9 +49,9 @@ export default function SettingsPage() {
     try {
       const response = await api.post("/api/media/upload", formData, { headers: { "Content-Type": "multipart/form-data" } });
       updateMutation.mutate({ logoUrl: response.data.url });
-      toast({ title: "✅ Logo updated successfully!" });
+      toast({ title: "تم تحديث الشعار بنجاح" });
     } catch (err: any) {
-      toast({ title: "Upload Error", description: err.response?.data?.error || "Failed to upload logo", variant: "destructive" });
+      toast({ title: "خطأ في الرفع", description: err.response?.data?.error || "فشل رفع الشعار", variant: "destructive" });
     } finally {
       setIsUploadingLogo(false);
       e.target.value = "";
@@ -50,9 +67,9 @@ export default function SettingsPage() {
     try {
       const response = await api.post("/api/media/upload", formData, { headers: { "Content-Type": "multipart/form-data" } });
       updateMutation.mutate({ coverUrl: response.data.url });
-      toast({ title: "✅ Cover banner updated successfully!" });
+      toast({ title: "تم تحديث غلاف المتجر بنجاح" });
     } catch (err: any) {
-      toast({ title: "Upload Error", description: err.response?.data?.error || "Failed to upload cover", variant: "destructive" });
+      toast({ title: "خطأ في الرفع", description: err.response?.data?.error || "فشل رفع الغلاف", variant: "destructive" });
     } finally {
       setIsUploadingCover(false);
       e.target.value = "";
@@ -73,10 +90,10 @@ export default function SettingsPage() {
     mutationFn: (data: Record<string, string>) => api.put("/api/tenant", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenant"] });
-      toast({ title: "✅ Settings saved!" });
+      toast({ title: "تم حفظ الإعدادات بنجاح" });
     },
     onError: (err: any) => {
-      toast({ title: "Error", description: err.response?.data?.error || "Failed to save settings", variant: "destructive" });
+      toast({ title: "خطأ", description: err.response?.data?.error || "فشل حفظ الإعدادات", variant: "destructive" });
     },
   });
 
@@ -84,10 +101,10 @@ export default function SettingsPage() {
     mutationFn: (themeId: ThemeId) => api.put("/api/tenant", { theme: themeId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenant"] });
-      toast({ title: "✅ Theme applied!", description: "Your storefront now uses the new theme." });
+      toast({ title: "تم تفعيل القالب بنجاح", description: "واجهة متجرك تعرض الآن القالب المختار." });
     },
     onError: (err: any) => {
-      toast({ title: "Error", description: err.response?.data?.error || "Failed to apply theme", variant: "destructive" });
+      toast({ title: "خطأ", description: err.response?.data?.error || "فشل تطبيق القالب", variant: "destructive" });
     },
   });
 
@@ -96,11 +113,11 @@ export default function SettingsPage() {
       api.post("/api/tenant/members/invite", { email, role }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["members"] });
-      toast({ title: "✅ Member invited!" });
+      toast({ title: "تم إرسال الدعوة بنجاح" });
       setInviteEmail("");
     },
     onError: (err: unknown) => {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Failed to invite";
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "فشل إرسال الدعوة";
       toast({ title: msg, variant: "destructive" });
     },
   });
@@ -109,7 +126,7 @@ export default function SettingsPage() {
     mutationFn: (memberId: string) => api.delete(`/api/tenant/members/${memberId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["members"] });
-      toast({ title: "Member removed" });
+      toast({ title: "تمت إزالة العضو" });
     },
   });
 
@@ -120,31 +137,31 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "general", label: "General" },
-    { id: "themes", label: "Themes" },
-    { id: "team", label: "Team" },
+    { id: "themes", label: "Themes & Layout" },
+    { id: "team", label: "Team & Permissions" },
   ];
 
   return (
     <div className="max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your store settings and appearance</p>
+        <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">Settings</h1>
+        <p className="text-[13px] text-[#86868b] mt-0.5">Manage store configuration, branding, and themes</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex gap-2 border-b border-black/[0.06] dark:border-white/[0.08] pb-2">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs font-semibold rounded-full transition-all active:scale-95 flex items-center gap-2 ${
               activeTab === tab.id
-                ? "border-brand-500 text-brand-600 dark:text-brand-400"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                ? "bg-[#0066cc] text-white shadow-none"
+                : "bg-[#f5f5f7] dark:bg-[#272729] text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-[#ebebee] dark:hover:bg-[#333336]"
             }`}
           >
-            {tab.id === "themes" && <Palette className="w-3.5 h-3.5" />}
-            {tab.label}
+            {tab.id === "themes" && <FontAwesomeIcon icon={faPalette} className="w-3 h-3" />}
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -152,37 +169,39 @@ export default function SettingsPage() {
       {/* ══════ GENERAL TAB ══════ */}
       {activeTab === "general" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 space-y-5">
+          className="apple-card space-y-5">
           {isLoading ? (
-            <div className="flex justify-center h-32 items-center"><Loader2 className="w-6 h-6 animate-spin text-brand-500" /></div>
+            <div className="flex justify-center h-32 items-center">
+              <FontAwesomeIcon icon={faCircleNotch} className="w-6 h-6 animate-spin text-[#0066cc]" />
+            </div>
           ) : (
             <>
-              <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200">Store Information</h2>
+              <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-white">Store Information</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Store Name</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Store Name</label>
                   <input id="store-name-setting" defaultValue={tenant?.name} onBlur={(e) => updateMutation.mutate({ name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors" />
+                    className="apple-input text-sm" />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Description</label>
                   <textarea defaultValue={tenant?.description || ""} onBlur={(e) => updateMutation.mutate({ description: e.target.value })} rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors resize-none" />
+                    className="apple-input text-sm resize-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Email</label>
                   <input type="email" defaultValue={tenant?.email || ""} onBlur={(e) => updateMutation.mutate({ email: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors" />
+                    className="apple-input text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Phone</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Phone</label>
                   <input defaultValue={tenant?.phone || ""} onBlur={(e) => updateMutation.mutate({ phone: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors" />
+                    className="apple-input text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Currency</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Currency</label>
                   <select defaultValue={tenant?.currency || "EGP"} onChange={(e) => updateMutation.mutate({ currency: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 transition-colors">
+                    className="apple-input text-sm">
                     <option value="EGP">EGP — Egyptian Pound</option>
                     <option value="USD">USD — US Dollar</option>
                     <option value="EUR">EUR — Euro</option>
@@ -191,57 +210,59 @@ export default function SettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Brand Color</label>
+                  <label className="block text-[13px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] mb-1.5">Brand Accent Color</label>
                   <div className="flex items-center gap-3">
-                    <input type="color" defaultValue={tenant?.primaryColor || "#6366f1"} onChange={(e) => updateMutation.mutate({ primaryColor: e.target.value })}
-                      className="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer" />
-                    <span className="text-sm text-slate-500 dark:text-slate-400">{tenant?.primaryColor || "#6366f1"}</span>
+                    <input type="color" defaultValue={tenant?.primaryColor || "#0066cc"} onChange={(e) => updateMutation.mutate({ primaryColor: e.target.value })}
+                      className="w-10 h-10 rounded-full border border-black/[0.08] dark:border-white/[0.12] cursor-pointer p-0 overflow-hidden" />
+                    <span className="text-xs font-mono text-[#86868b]">{tenant?.primaryColor || "#0066cc"}</span>
                   </div>
                 </div>
               </div>
 
               {/* Branding */}
-              <div className="pt-5 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">Store Appearance & Branding</h3>
+              <div className="pt-5 border-t border-black/[0.04] dark:border-white/[0.06] space-y-4">
+                <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-white">Store Branding & Assets</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-4">
-                    <div className="w-20 h-20 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center relative flex-shrink-0">
-                      {tenant?.logoUrl ? <img src={tenant.logoUrl} alt="Store Logo" className="w-full h-full object-cover" /> : <span className="text-sm font-bold text-slate-400">No Logo</span>}
-                      {isUploadingLogo && <div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70 flex items-center justify-center"><Loader2 className="w-5 h-5 animate-spin text-brand-500" /></div>}
+                  <div className="p-4 bg-[#f5f5f7] dark:bg-[#272729] rounded-2xl border border-black/[0.04] dark:border-white/[0.06] flex flex-col sm:flex-row items-center gap-4">
+                    <div className="w-20 h-20 rounded-2xl bg-white dark:bg-[#1d1d1f] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden flex items-center justify-center relative flex-shrink-0">
+                      {tenant?.logoUrl ? <img src={tenant.logoUrl} alt="Store Logo" className="w-full h-full object-cover" /> : <span className="text-xs font-semibold text-[#86868b]">No Logo</span>}
+                      {isUploadingLogo && <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center"><FontAwesomeIcon icon={faCircleNotch} className="w-5 h-5 animate-spin text-[#0066cc]" /></div>}
                     </div>
                     <div className="flex-1 text-center sm:text-left">
-                      <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Store Logo</h4>
-                      <p className="text-[11px] text-slate-450 mt-0.5 mb-2.5">Upload a square logo for your store header</p>
+                      <h4 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">Store Logo</h4>
+                      <p className="text-[11px] text-[#86868b] mt-0.5 mb-2.5">Upload a square logo for your store header</p>
                       <input type="file" ref={logoInputRef} accept="image/*" onChange={handleLogoUpload} disabled={isUploadingLogo} className="hidden" />
                       <button type="button" onClick={() => logoInputRef.current?.click()} disabled={isUploadingLogo}
-                        className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 border border-slate-250 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                        Upload Logo
+                        className="btn-apple-pearl text-xs px-3 py-1.5 inline-flex items-center gap-1.5">
+                        <FontAwesomeIcon icon={faUpload} className="w-3 h-3" />
+                        <span>Upload Logo</span>
                       </button>
                     </div>
                   </div>
-                  <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-4">
-                    <div className="w-32 h-20 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center relative flex-shrink-0">
-                      {tenant?.coverUrl ? <img src={tenant.coverUrl} alt="Cover" className="w-full h-full object-cover" /> : <span className="text-xs font-bold text-slate-400">No Cover</span>}
-                      {isUploadingCover && <div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70 flex items-center justify-center"><Loader2 className="w-5 h-5 animate-spin text-brand-500" /></div>}
+                  <div className="p-4 bg-[#f5f5f7] dark:bg-[#272729] rounded-2xl border border-black/[0.04] dark:border-white/[0.06] flex flex-col sm:flex-row items-center gap-4">
+                    <div className="w-32 h-20 rounded-2xl bg-white dark:bg-[#1d1d1f] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden flex items-center justify-center relative flex-shrink-0">
+                      {tenant?.coverUrl ? <img src={tenant.coverUrl} alt="Cover" className="w-full h-full object-cover" /> : <span className="text-xs font-semibold text-[#86868b]">No Cover</span>}
+                      {isUploadingCover && <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center"><FontAwesomeIcon icon={faCircleNotch} className="w-5 h-5 animate-spin text-[#0066cc]" /></div>}
                     </div>
                     <div className="flex-1 text-center sm:text-left">
-                      <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Cover Banner</h4>
-                      <p className="text-[11px] text-slate-450 mt-0.5 mb-2.5">Upload a landscape header image</p>
+                      <h4 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">Cover Banner</h4>
+                      <p className="text-[11px] text-[#86868b] mt-0.5 mb-2.5">Upload a landscape header image</p>
                       <input type="file" ref={coverInputRef} accept="image/*" onChange={handleCoverUpload} disabled={isUploadingCover} className="hidden" />
                       <button type="button" onClick={() => coverInputRef.current?.click()} disabled={isUploadingCover}
-                        className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-350 border border-slate-250 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                        Upload Cover
+                        className="btn-apple-pearl text-xs px-3 py-1.5 inline-flex items-center gap-1.5">
+                        <FontAwesomeIcon icon={faUpload} className="w-3 h-3" />
+                        <span>Upload Cover</span>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="pt-4 border-t border-black/[0.04] dark:border-white/[0.06]">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Store URL: <span className="font-mono text-brand-600 dark:text-brand-400">/store/{tenant?.slug}</span>
+                  <p className="text-[13px] text-[#86868b]">
+                    Storefront Live URL: <span className="font-mono text-[#0066cc] dark:text-[#2997ff]">/store/{tenant?.slug}</span>
                   </p>
                 </div>
               </div>
@@ -253,23 +274,24 @@ export default function SettingsPage() {
       {/* ══════ THEMES TAB ══════ */}
       {activeTab === "themes" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 via-brand-500 to-indigo-600 rounded-2xl p-6 text-white">
+          {/* Header banner */}
+          <div className="bg-[#1d1d1f] dark:bg-[#272729] rounded-2xl p-6 text-white border border-black/[0.08] dark:border-white/[0.12]">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <FontAwesomeIcon icon={faPalette} className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold">Storefront Themes</h2>
-                <p className="text-sm text-white/75">Choose a beautiful design for your customers</p>
+                <h2 className="text-base font-semibold">Storefront Themes</h2>
+                <p className="text-xs text-white/70">Select an Apple-grade, high-end theme for your storefront</p>
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3 text-xs text-white/70">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Active: <span className="font-bold text-white capitalize">{activeTheme}</span></span>
+              <span>Active Theme: <strong className="font-bold text-white capitalize">{activeTheme}</strong></span>
               {storeSlug && (
-                <a href={`/store/${storeSlug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 ml-2 hover:text-white transition-colors">
-                  <ExternalLink className="w-3 h-3" /> View Store
+                <a href={`/store/${storeSlug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 ml-3 hover:text-white transition-colors text-[#2997ff]">
+                  <span>Open Store</span>
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-2.5 h-2.5" />
                 </a>
               )}
             </div>
@@ -283,17 +305,16 @@ export default function SettingsPage() {
               return (
                 <motion.div
                   key={theme.id}
-                  whileHover={{ y: -3 }}
-                  className={`relative rounded-2xl border-2 overflow-hidden transition-all cursor-pointer group ${
+                  whileHover={{ y: -2 }}
+                  className={`relative rounded-[18px] border-2 overflow-hidden transition-all cursor-pointer group apple-card p-0 ${
                     isActive
-                      ? "border-brand-500 shadow-lg shadow-brand-500/20"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                      ? "border-[#0066cc] dark:border-[#2997ff]"
+                      : "border-black/[0.06] dark:border-white/[0.08]"
                   }`}
                   onClick={() => setPreviewTheme(isPreviewing ? null : theme.id as ThemeId)}
                 >
                   {/* Gradient Thumbnail */}
                   <div className={`h-28 bg-gradient-to-br ${theme.gradient} relative overflow-hidden`}>
-                    {/* Simulated UI elements */}
                     <div className="absolute inset-0 opacity-20">
                       <div className="h-6 w-full bg-white/30" />
                       <div className="flex gap-2 p-3">
@@ -305,53 +326,52 @@ export default function SettingsPage() {
                     {/* Color swatches */}
                     <div className="absolute bottom-2 right-2 flex gap-1">
                       {theme.previewColors.map((c, i) => (
-                        <div key={i} className="w-4 h-4 rounded-full border-2 border-white/40 shadow-sm" style={{ backgroundColor: c }} />
+                        <div key={i} className="w-3.5 h-3.5 rounded-full border-2 border-white/60 shadow-sm" style={{ backgroundColor: c }} />
                       ))}
                     </div>
                     {/* Active badge */}
                     {isActive && (
-                      <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-black text-white bg-brand-500 shadow-sm">
-                        <Check className="w-2.5 h-2.5" /> Active
+                      <div className="absolute top-2 left-2 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white bg-[#0066cc]">
+                        <FontAwesomeIcon icon={faCheck} className="w-2.5 h-2.5" />
+                        <span>Active</span>
                       </div>
                     )}
                   </div>
 
                   {/* Card Info */}
-                  <div className="p-4 bg-white dark:bg-slate-900">
+                  <div className="p-4">
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-bold text-slate-800 dark:text-white">{theme.name}</h3>
-                      <span className="text-[10px] text-slate-400 font-medium">{theme.fontFamily}</span>
+                      <h3 className="font-semibold text-sm text-[#1d1d1f] dark:text-white">{theme.name}</h3>
+                      <span className="text-[10px] text-[#86868b] font-medium">{theme.fontFamily}</span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">{theme.description}</p>
+                    <p className="text-xs text-[#86868b] leading-relaxed mb-4">{theme.description}</p>
 
                     <div className="flex gap-2">
-                      {/* Preview button */}
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setPreviewTheme(isPreviewing ? null : theme.id as ThemeId); setIframeKey(k => k + 1); }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                           isPreviewing
-                            ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900"
-                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300"
+                            ? "bg-[#1d1d1f] text-white dark:bg-white dark:text-[#1d1d1f]"
+                            : "btn-apple-pearl"
                         }`}
                       >
-                        {isPreviewing ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        {isPreviewing ? "Hide" : "Preview"}
+                        <FontAwesomeIcon icon={isPreviewing ? faEyeSlash : faEye} className="w-3 h-3" />
+                        <span>{isPreviewing ? "Hide" : "Preview"}</span>
                       </button>
 
-                      {/* Apply button */}
                       <button
                         type="button"
                         disabled={isActive || applyThemeMutation.isPending}
                         onClick={(e) => { e.stopPropagation(); applyThemeMutation.mutate(theme.id as ThemeId); }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                           isActive
-                            ? "bg-brand-50 dark:bg-brand-950/30 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800 cursor-default"
-                            : "bg-brand-500 text-white hover:bg-brand-600 shadow-sm"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default"
+                            : "btn-apple-primary"
                         }`}
                       >
-                        {applyThemeMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : isActive ? <Check className="w-3.5 h-3.5" /> : null}
-                        {isActive ? "Applied" : "Apply"}
+                        {applyThemeMutation.isPending ? <FontAwesomeIcon icon={faCircleNotch} className="w-3 h-3 animate-spin" /> : isActive ? <FontAwesomeIcon icon={faCheck} className="w-3 h-3" /> : null}
+                        <span>{isActive ? "Applied" : "Apply"}</span>
                       </button>
                     </div>
                   </div>
@@ -364,24 +384,24 @@ export default function SettingsPage() {
           <AnimatePresence>
             {previewTheme && storeSlug && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-xl"
+                exit={{ opacity: 0, y: 15 }}
+                className="apple-card p-0 overflow-hidden shadow-apple-modal"
               >
                 {/* Preview Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between px-4 py-3 bg-[#f5f5f7] dark:bg-[#272729] border-b border-black/[0.06] dark:border-white/[0.08]">
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                     </div>
-                    <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 hidden sm:block">
+                    <span className="text-xs font-mono text-[#86868b] bg-white dark:bg-[#1d1d1f] px-3 py-0.5 rounded-full border border-black/[0.06] dark:border-white/[0.08] hidden sm:block">
                       /store/{storeSlug}?preview={previewTheme}
                     </span>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 capitalize">
-                      {previewTheme} Theme Preview
+                    <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white capitalize">
+                      {previewTheme} Preview
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -389,12 +409,13 @@ export default function SettingsPage() {
                       href={`/store/${storeSlug}?preview=${previewTheme}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+                      className="flex items-center gap-1 text-xs font-semibold text-[#0066cc] dark:text-[#2997ff] hover:underline"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" /> Open
+                      <span>Open in New Tab</span>
+                      <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-2.5 h-2.5" />
                     </a>
-                    <button onClick={() => setPreviewTheme(null)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    <button onClick={() => setPreviewTheme(null)} className="w-7 h-7 rounded-full flex items-center justify-center text-[#86868b] hover:text-[#1d1d1f] hover:bg-black/[0.04] transition-colors">
+                      <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -411,17 +432,17 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Apply from preview */}
-                <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Previewing <span className="font-bold capitalize text-slate-700 dark:text-slate-200">{previewTheme}</span> theme — changes are not saved yet.
+                <div className="px-4 py-3 bg-[#f5f5f7] dark:bg-[#272729] border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+                  <p className="text-xs text-[#86868b]">
+                    Previewing <strong className="font-semibold capitalize text-[#1d1d1f] dark:text-white">{previewTheme}</strong> theme
                   </p>
                   <button
                     disabled={activeTheme === previewTheme || applyThemeMutation.isPending}
                     onClick={() => applyThemeMutation.mutate(previewTheme)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-default shadow-sm"
+                    className="btn-apple-primary text-xs px-4 py-2"
                   >
-                    {applyThemeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {activeTheme === previewTheme ? "Already Applied" : "Apply This Theme"}
+                    {applyThemeMutation.isPending ? <FontAwesomeIcon icon={faCircleNotch} className="w-3 h-3 animate-spin" /> : <FontAwesomeIcon icon={faCheck} className="w-3 h-3" />}
+                    <span>{activeTheme === previewTheme ? "Already Applied" : "Apply This Theme"}</span>
                   </button>
                 </div>
               </motion.div>
@@ -433,50 +454,52 @@ export default function SettingsPage() {
       {/* ══════ TEAM TAB ══════ */}
       {activeTab === "team" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6">
-            <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-              <UserPlus className="w-4 h-4" /> Invite Team Member
+          <div className="apple-card space-y-4">
+            <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-2">
+              <FontAwesomeIcon icon={faUserPlus} className="w-3.5 h-3.5 text-[#0066cc]" />
+              <span>Invite Team Member</span>
             </h2>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="colleague@example.com"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors text-sm" />
+                className="flex-1 min-w-[220px] apple-input text-xs" />
               <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
-                className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 transition-colors text-sm">
+                className="apple-input text-xs w-auto">
                 <option value="ADMIN">Admin</option>
                 <option value="STAFF">Staff</option>
               </select>
               <button onClick={() => inviteMutation.mutate({ email: inviteEmail, role: inviteRole })} disabled={inviteMutation.isPending || !inviteEmail}
-                className="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50">
-                {inviteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Invite
+                className="btn-apple-primary text-xs px-4 py-2 disabled:opacity-50">
+                {inviteMutation.isPending ? <FontAwesomeIcon icon={faCircleNotch} className="w-3 h-3 animate-spin" /> : <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />}
+                <span>Send Invite</span>
               </button>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 divide-y divide-slate-50 dark:divide-slate-800">
+          <div className="apple-card p-0 overflow-hidden divide-y divide-black/[0.03] dark:divide-white/[0.04]">
             <div className="px-6 py-4">
-              <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                <Users className="w-4 h-4" /> Team Members ({members.length})
+              <h2 className="text-sm font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-2">
+                <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5 text-[#0066cc]" />
+                <span>Team Members ({members.length})</span>
               </h2>
             </div>
             {members.map((member: { id: string; role: string; user: { id: string; name: string; email: string } }) => (
-              <div key={member.id} className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+              <div key={member.id} className="flex items-center justify-between px-6 py-4 hover:bg-black/[0.02] transition-colors">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-8 h-8 rounded-full bg-[#0066cc] flex items-center justify-center text-white text-xs font-semibold">
                     {member.user.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{member.user.name}</p>
-                    <p className="text-xs text-slate-400">{member.user.email}</p>
+                    <p className="text-[14px] font-semibold text-[#1d1d1f] dark:text-white">{member.user.name}</p>
+                    <p className="text-[11px] text-[#86868b]">{member.user.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`badge ${member.role === "OWNER" ? "badge-blue" : member.role === "ADMIN" ? "badge-green" : "badge-gray"}`}>
+                  <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${member.role === "OWNER" ? "badge-apple-blue" : member.role === "ADMIN" ? "badge-apple-green" : "badge-apple-gray"}`}>
                     {member.role.charAt(0) + member.role.slice(1).toLowerCase()}
                   </span>
                   {member.role !== "OWNER" && (
-                    <button onClick={() => removeMemberMutation.mutate(member.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 text-slate-400 hover:text-red-500 transition-colors">
-                      <Trash2 className="w-4 h-4" />
+                    <button onClick={() => removeMemberMutation.mutate(member.id)} className="w-7 h-7 rounded-full flex items-center justify-center text-[#86868b] hover:text-rose-600 hover:bg-rose-500/10 transition-colors">
+                      <FontAwesomeIcon icon={faTrashCan} className="w-3 h-3" />
                     </button>
                   )}
                 </div>

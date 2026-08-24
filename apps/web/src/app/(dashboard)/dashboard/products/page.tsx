@@ -3,17 +3,23 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Plus, Search, Package, Edit, Trash2, Filter,
-  Loader2, MoreHorizontal, Eye, EyeOff,
-} from "lucide-react";
+  faPlus,
+  faMagnifyingGlass,
+  faBoxArchive,
+  faPenToSquare,
+  faTrashCan,
+  faCircleNotch,
+  faEllipsis,
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api";
 import { formatCurrency, PRODUCT_STATUS_COLORS, cn } from "@/lib/utils";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-
-const STATUS_OPTIONS = ["", "ACTIVE", "DRAFT", "ARCHIVED"];
 
 export default function ProductsPage() {
   const { toast } = useToast();
@@ -46,37 +52,38 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Products</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {pagination?.total ?? 0} products total
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">Products</h1>
+          <p className="text-[13px] text-[#86868b] mt-0.5">
+            {pagination?.total ?? 0} products catalogued
           </p>
         </div>
         <Link
           href="/dashboard/products/new"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors shadow-sm shadow-brand-500/25"
+          className="btn-apple-primary text-[14px]"
         >
-          <Plus className="w-4 h-4" /> Add Product
+          <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
+          <span>Add Product</span>
         </Link>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <div className="relative flex-1 min-w-[240px]">
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#86868b]" />
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors text-sm"
+            className="apple-search-pill pl-9 pr-4"
           />
         </div>
         <select
           value={status}
           onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-          className="px-3 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:border-brand-500 transition-colors"
+          className="px-4 py-2.5 rounded-full bg-[#f5f5f7] dark:bg-[#272729] border border-black/[0.06] dark:border-white/[0.08] text-[13px] font-medium text-[#1d1d1f] dark:text-white focus:outline-none focus:border-[#0066cc] transition-colors"
         >
           <option value="">All Status</option>
           <option value="ACTIVE">Active</option>
@@ -86,20 +93,20 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+      <div className="apple-card p-0 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-48">
-            <Loader2 className="w-6 h-6 animate-spin text-brand-500" />
+            <FontAwesomeIcon icon={faCircleNotch} className="w-6 h-6 animate-spin text-[#0066cc] dark:text-[#2997ff]" />
           </div>
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-3 text-slate-400">
-            <Package className="w-12 h-12 opacity-30" />
-            <p className="text-sm">No products found</p>
+          <div className="flex flex-col items-center justify-center h-52 gap-3 text-[#86868b]">
+            <FontAwesomeIcon icon={faBoxArchive} className="w-8 h-8 opacity-30" />
+            <p className="text-[14px]">No products found</p>
             <Link
               href="/dashboard/products/new"
-              className="text-brand-600 dark:text-brand-400 text-sm hover:underline"
+              className="text-[#0066cc] dark:text-[#2997ff] text-[13px] hover:underline font-medium"
             >
-              Add your first product →
+              Add your first product
             </Link>
           </div>
         ) : (
@@ -107,17 +114,17 @@ export default function ProductsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-left">
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Product</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Sales</th>
+                  <tr className="border-b border-black/[0.04] dark:border-white/[0.06] text-left">
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Product</th>
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Price</th>
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Stock</th>
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3.5 text-[11px] font-semibold text-[#86868b] uppercase tracking-wider">Sales</th>
                     <th className="relative px-6 py-3.5"><span className="sr-only">Actions</span></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                <tbody className="divide-y divide-black/[0.03] dark:divide-white/[0.04]">
                   {products.map((product: {
                     id: string;
                     name: string;
@@ -133,40 +140,40 @@ export default function ProductsPage() {
                       key={product.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                      transition={{ delay: index * 0.02 }}
+                      className="hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden flex-shrink-0">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-11 h-11 rounded-xl bg-[#f5f5f7] dark:bg-[#272729] overflow-hidden flex-shrink-0 flex items-center justify-center">
                             {product.images?.[0] ? (
                               <Image
                                 src={product.images[0].url}
                                 alt={product.name}
-                                width={40}
-                                height={40}
+                                width={44}
+                                height={44}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <Package className="w-5 h-5 text-slate-400 m-2.5" />
+                              <FontAwesomeIcon icon={faBoxArchive} className="w-4 h-4 text-[#86868b]" />
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                            <p className="text-[14px] font-semibold text-[#1d1d1f] dark:text-white">
                               {product.name}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                      <td className="px-6 py-4 text-[13px] text-[#86868b]">
                         {product.category?.name || "—"}
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        <p className="text-[14px] font-semibold text-[#1d1d1f] dark:text-white">
                           {formatCurrency(Number(product.price))}
                         </p>
                         {product.comparePrice && (
-                          <p className="text-xs text-slate-400 line-through">
+                          <p className="text-[11px] text-[#86868b] line-through">
                             {formatCurrency(Number(product.comparePrice))}
                           </p>
                         )}
@@ -174,52 +181,54 @@ export default function ProductsPage() {
                       <td className="px-6 py-4">
                         <span
                           className={cn(
-                            "text-sm font-medium",
+                            "text-[13px] font-medium",
                             product.quantity === 0
-                              ? "text-red-500"
+                              ? "text-rose-600 dark:text-rose-400"
                               : product.quantity < 10
-                              ? "text-amber-500"
-                              : "text-slate-700 dark:text-slate-300"
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-[#1d1d1f] dark:text-[#f5f5f7]"
                           )}
                         >
                           {product.quantity}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`badge ${PRODUCT_STATUS_COLORS[product.status]}`}>
+                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${PRODUCT_STATUS_COLORS[product.status]}`}>
                           {product.status.charAt(0) + product.status.slice(1).toLowerCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                      <td className="px-6 py-4 text-[13px] text-[#86868b]">
                         {product._count?.orderItems ?? 0} sold
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="relative">
                           <button
                             onClick={() => setActiveMenu(activeMenu === product.id ? null : product.id)}
-                            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-[#86868b] hover:text-[#1d1d1f] dark:hover:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
                           >
-                            <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                            <FontAwesomeIcon icon={faEllipsis} className="w-3.5 h-3.5" />
                           </button>
                           {activeMenu === product.id && (
                             <>
                               <div className="fixed inset-0 z-20" onClick={() => setActiveMenu(null)} />
-                              <div className="absolute right-0 top-full mt-1 z-30 w-40 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-lg overflow-hidden">
+                              <div className="absolute right-0 top-full mt-1 z-30 w-36 bg-white dark:bg-[#272729] rounded-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-apple-modal overflow-hidden p-1">
                                 <Link
                                   href={`/dashboard/products/${product.id}/edit`}
-                                  className="flex items-center gap-2 px-3 py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-[#1d1d1f] dark:text-white hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors"
                                   onClick={() => setActiveMenu(null)}
                                 >
-                                  <Edit className="w-3.5 h-3.5" /> Edit
+                                  <FontAwesomeIcon icon={faPenToSquare} className="w-3.5 h-3.5 text-[#86868b]" />
+                                  <span>Edit</span>
                                 </Link>
                                 <button
                                   onClick={() => {
                                     deleteMutation.mutate(product.id);
                                     setActiveMenu(null);
                                   }}
-                                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors font-medium text-left"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                                  <FontAwesomeIcon icon={faTrashCan} className="w-3.5 h-3.5" />
+                                  <span>Delete</span>
                                 </button>
                               </div>
                             </>
@@ -234,8 +243,8 @@ export default function ProductsPage() {
 
             {/* Pagination */}
             {pagination && pagination.pages > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-sm text-slate-500">
+              <div className="flex items-center justify-between px-6 py-4 border-t border-black/[0.04] dark:border-white/[0.06]">
+                <p className="text-[13px] text-[#86868b]">
                   Showing {(pagination.page - 1) * pagination.limit + 1}–
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
                 </p>
@@ -243,16 +252,18 @@ export default function ProductsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    className="btn-apple-pearl text-xs px-3 py-1.5 disabled:opacity-40"
                   >
+                    <FontAwesomeIcon icon={faChevronLeft} className="w-2.5 h-2.5 mr-1" />
                     Previous
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                     disabled={page === pagination.pages}
-                    className="px-3 py-1.5 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                    className="btn-apple-pearl text-xs px-3 py-1.5 disabled:opacity-40"
                   >
                     Next
+                    <FontAwesomeIcon icon={faChevronRight} className="w-2.5 h-2.5 ml-1" />
                   </button>
                 </div>
               </div>

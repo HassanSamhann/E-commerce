@@ -3,7 +3,20 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Calendar, User, Phone, Mail, MapPin, ClipboardList, CheckCircle, ShoppingBag, CreditCard } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faCircleNotch,
+  faCalendar,
+  faUser,
+  faPhone,
+  faEnvelope,
+  faLocationDot,
+  faListCheck,
+  faBagShopping,
+  faCreditCard,
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api";
 import { formatCurrency, formatDate, ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language.context";
@@ -35,15 +48,14 @@ export default function OrderDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast({
-        title: isRtl ? "تمت تحديث الحالة!" : "Status Updated!",
-        description: isRtl ? "تم تحديث حالة الطلب بنجاح." : "Order status has been updated successfully.",
+        title: isRtl ? "تمت تحديث الحالة بنجاح" : "Status Updated",
       });
     },
     onError: (err: any) => {
       toast({
         variant: "destructive",
         title: isRtl ? "فشل التحديث" : "Update Failed",
-        description: err.response?.data?.error || (isRtl ? "حدث خطأ أثناء التحديث." : "Failed to update order status."),
+        description: err.response?.data?.error || "Failed to update order status.",
       });
     },
   });
@@ -60,15 +72,14 @@ export default function OrderDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ["order", id] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast({
-        title: isRtl ? "تم تحديث حالة الدفع!" : "Payment Status Updated!",
-        description: isRtl ? "تم تحديث حالة دفع الطلب بنجاح." : "Order payment status has been updated successfully.",
+        title: isRtl ? "تم تحديث حالة الدفع بنجاح" : "Payment Status Updated",
       });
     },
     onError: (err: any) => {
       toast({
         variant: "destructive",
         title: isRtl ? "فشل تحديث الدفع" : "Update Failed",
-        description: err.response?.data?.error || (isRtl ? "حدث خطأ أثناء تحديث حالة الدفع." : "Failed to update payment status."),
+        description: err.response?.data?.error || "Failed to update payment status.",
       });
     },
   });
@@ -97,7 +108,7 @@ export default function OrderDetailsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
+        <FontAwesomeIcon icon={faCircleNotch} className="w-8 h-8 animate-spin text-[#0066cc]" />
       </div>
     );
   }
@@ -105,15 +116,15 @@ export default function OrderDetailsPage() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+        <h2 className="text-lg font-semibold text-[#1d1d1f] dark:text-white">
           {isRtl ? "الطلب غير موجود" : "Order Not Found"}
         </h2>
-        <p className="text-slate-400 mt-2">
+        <p className="text-[#86868b] mt-2 text-sm">
           {isRtl ? "الطلب الذي تبحث عنه قد يكون تم حذفه أو غير متوفر." : "The order you are looking for does not exist or has been removed."}
         </p>
         <Link
           href="/dashboard/orders"
-          className="inline-block mt-4 text-brand-500 font-semibold hover:underline"
+          className="btn-apple-primary text-sm mt-4 inline-flex"
         >
           {isRtl ? "العودة للطلبات" : "Back to Orders"}
         </Link>
@@ -124,41 +135,43 @@ export default function OrderDetailsPage() {
   const order = data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRtl ? "rtl" : "ltr"}>
       {/* Back & Header */}
       <div>
         <Link
           href="/dashboard/orders"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-450 hover:text-slate-700 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-[#86868b] hover:text-[#0066cc] dark:hover:text-[#2997ff] transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> {isRtl ? "العودة لقائمة الطلبات" : "Back to Orders"}
+          <FontAwesomeIcon icon={isRtl ? faArrowRight : faArrowLeft} className="w-3 h-3" />
+          <span>{isRtl ? "العودة لقائمة الطلبات" : "Back to Orders"}</span>
         </Link>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-3">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-extrabold text-slate-850 dark:text-white font-mono">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight font-mono">
                 {order.orderNumber}
               </h1>
-              <span className={`badge ${ORDER_STATUS_COLORS[order.status]}`}>
+              <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${ORDER_STATUS_COLORS[order.status]}`}>
                 {isRtl ? getArabicStatusLabel(order.status) : ORDER_STATUS_LABELS[order.status]}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" /> {formatDate(order.createdAt)}
+            <p className="text-xs text-[#86868b] mt-1 flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faCalendar} className="w-3 h-3" />
+              <span>{formatDate(order.createdAt)}</span>
             </p>
           </div>
 
           {/* Quick status switcher */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-500">
+            <span className="text-[13px] font-medium text-[#86868b]">
               {isRtl ? "تغيير حالة الطلب:" : "Change Status:"}
             </span>
             <select
               value={order.status}
               onChange={handleStatusChange}
               disabled={updateStatusMutation.isPending}
-              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-semibold"
+              className="px-3.5 py-1.5 rounded-full border border-black/[0.08] dark:border-white/[0.12] bg-[#f5f5f7] dark:bg-[#272729] text-[#1d1d1f] dark:text-white text-xs font-semibold focus:outline-none focus:border-[#0066cc] transition-all"
             >
               <option value="PENDING">{isRtl ? "قيد الانتظار" : "Pending"}</option>
               <option value="CONFIRMED">{isRtl ? "تم التأكيد" : "Confirmed"}</option>
@@ -176,34 +189,34 @@ export default function OrderDetailsPage() {
         {/* Left 2 Columns: Order summary and items list */}
         <div className="lg:col-span-2 space-y-6">
           {/* Items card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-            <h2 className="text-base font-bold text-slate-800 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-3 flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-slate-500" />
-              {isRtl ? "المنتجات المطلوبة" : "Ordered Items"}
+          <div className="apple-card space-y-6">
+            <h2 className="text-base font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-3 flex items-center gap-2 tracking-tight">
+              <FontAwesomeIcon icon={faListCheck} className="w-4 h-4 text-[#0066cc] dark:text-[#2997ff]" />
+              <span>{isRtl ? "المنتجات المطلوبة" : "Ordered Items"}</span>
             </h2>
 
-            <div className="divide-y divide-slate-50 dark:divide-slate-800/60">
+            <div className="divide-y divide-black/[0.03] dark:divide-white/[0.04]">
               {order.items?.map((item: any) => (
-                <div key={item.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-450 border border-slate-100 dark:border-slate-750">
-                      <ShoppingBag className="w-5 h-5" />
+                <div key={item.id} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center text-[#86868b]">
+                      <FontAwesomeIcon icon={faBagShopping} className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-800 dark:text-white">
+                      <p className="text-sm font-semibold text-[#1d1d1f] dark:text-white">
                         {item.product?.name || item.name}
                       </p>
                       {item.variant && (
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {isRtl ? "النوع" : "Variant"}: {item.variant.name}
+                        <p className="text-xs text-[#86868b] mt-0.5">
+                          {isRtl ? "الخيار" : "Variant"}: {item.variant.name}
                         </p>
                       )}
-                      <p className="text-xs text-slate-450 mt-0.5">
+                      <p className="text-xs text-[#86868b] mt-0.5">
                         {formatCurrency(Number(item.price), order.currency)} × {item.quantity}
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-extrabold text-slate-800 dark:text-white">
+                  <span className="text-sm font-semibold text-[#1d1d1f] dark:text-white">
                     {formatCurrency(Number(item.total), order.currency)}
                   </span>
                 </div>
@@ -211,22 +224,22 @@ export default function OrderDetailsPage() {
             </div>
 
             {/* Calculations */}
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-5 space-y-3">
-              <div className="flex justify-between text-sm text-slate-450">
+            <div className="border-t border-black/[0.04] dark:border-white/[0.06] pt-4 space-y-2.5">
+              <div className="flex justify-between text-[13px] text-[#86868b]">
                 <span>{isRtl ? "المجموع الفرعي" : "Subtotal"}</span>
-                <span className="text-slate-800 dark:text-white font-medium">
+                <span className="text-[#1d1d1f] dark:text-white font-medium">
                   {formatCurrency(Number(order.subtotal), order.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-slate-450">
+              <div className="flex justify-between text-[13px] text-[#86868b]">
                 <span>{isRtl ? "رسوم الشحن" : "Shipping"}</span>
-                <span className="text-emerald-500 font-extrabold">
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                   {Number(order.shippingAmount) === 0 ? (isRtl ? "مجاني" : "Free") : formatCurrency(Number(order.shippingAmount), order.currency)}
                 </span>
               </div>
-              <div className="flex justify-between text-base text-slate-850 dark:text-white font-extrabold border-t border-slate-100 dark:border-slate-800 pt-3">
+              <div className="flex justify-between text-base text-[#1d1d1f] dark:text-white font-semibold border-t border-black/[0.04] dark:border-white/[0.06] pt-3">
                 <span>{isRtl ? "الإجمالي الكلي" : "Grand Total"}</span>
-                <span className="text-brand-600 dark:text-brand-400">
+                <span className="text-[#0066cc] dark:text-[#2997ff]">
                   {formatCurrency(Number(order.total), order.currency)}
                 </span>
               </div>
@@ -237,142 +250,140 @@ export default function OrderDetailsPage() {
         {/* Right Column: Customer details & shipping */}
         <div className="space-y-6">
           {/* Payment Details card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-extrabold text-slate-850 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-2 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-slate-400" />
-              {isRtl ? "تفاصيل وحالة الدفع" : "Payment Details"}
+          <div className="apple-card space-y-4">
+            <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2 flex items-center gap-2">
+              <FontAwesomeIcon icon={faCreditCard} className="w-3.5 h-3.5 text-[#0066cc] dark:text-[#2997ff]" />
+              <span>{isRtl ? "تفاصيل وحالة الدفع" : "Payment Details"}</span>
             </h3>
 
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               <div>
-                <p className="text-xs text-slate-400">{isRtl ? "طريقة الدفع" : "Payment Method"}</p>
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-0.5">
+                <p className="text-xs text-[#86868b]">{isRtl ? "طريقة الدفع" : "Payment Method"}</p>
+                <p className="text-sm font-semibold text-[#1d1d1f] dark:text-white mt-0.5">
                   {order.payments?.[0]?.method === "CARD" 
-                    ? (isRtl ? "بطاقة ائتمانية / أونلاين" : "Credit Card / Online")
+                    ? (isRtl ? "بطاقة ائتمانية / دفع إلكتروني" : "Credit Card / Online")
                     : (isRtl ? "الدفع عند الاستلام (كاش)" : "Cash on Delivery (COD)")}
                 </p>
               </div>
 
               <div>
-                <p className="text-xs text-slate-400 mb-1.5">{isRtl ? "حالة الدفع الحالية" : "Current Payment Status"}</p>
-                <span className={`badge ${
+                <p className="text-xs text-[#86868b] mb-1.5">{isRtl ? "حالة الدفع الحالية" : "Current Payment Status"}</p>
+                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                   order.paymentStatus === "PAID"
-                    ? "badge-green"
+                    ? "badge-apple-green"
                     : order.paymentStatus === "FAILED"
-                    ? "badge-red"
-                    : "badge-yellow"
+                    ? "badge-apple-red"
+                    : "badge-apple-amber"
                 }`}>
                   {order.paymentStatus === "PAID" 
                     ? (isRtl ? "تم الدفع" : "Paid")
                     : order.paymentStatus === "FAILED"
-                    ? (isRtl ? "فشلت" : "Failed")
+                    ? (isRtl ? "فشلت العملية" : "Failed")
                     : order.paymentStatus === "REFUNDED"
-                    ? (isRtl ? "مسترجعة" : "Refunded")
+                    ? (isRtl ? "مسترجع" : "Refunded")
                     : (isRtl ? "قيد الانتظار" : "Pending")}
                 </span>
               </div>
 
               {/* Edit Payment Status Selector */}
-              <div className="pt-2 border-t border-slate-50 dark:border-slate-800/60 space-y-1.5">
-                <label className="text-xs font-bold text-slate-550 dark:text-slate-405 block">
+              <div className="pt-2 border-t border-black/[0.04] dark:border-white/[0.06] space-y-1.5">
+                <label className="text-xs font-medium text-[#86868b] block">
                   {isRtl ? "تعديل حالة الدفع:" : "Change Payment Status:"}
                 </label>
                 <select
                   value={order.paymentStatus}
                   onChange={handlePaymentStatusChange}
                   disabled={updatePaymentStatusMutation.isPending}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-semibold"
+                  className="w-full px-3 py-1.5 rounded-full border border-black/[0.08] dark:border-white/[0.12] bg-[#f5f5f7] dark:bg-[#272729] text-[#1d1d1f] dark:text-white text-xs font-medium focus:outline-none focus:border-[#0066cc]"
                 >
                   <option value="PENDING">{isRtl ? "قيد الانتظار" : "Pending"}</option>
                   <option value="PAID">{isRtl ? "تم الدفع" : "Paid"}</option>
                   <option value="FAILED">{isRtl ? "فشلت" : "Failed"}</option>
-                  <option value="REFUNDED">{isRtl ? "مسترجعة" : "Refunded"}</option>
+                  <option value="REFUNDED">{isRtl ? "مسترجع" : "Refunded"}</option>
                 </select>
               </div>
             </div>
           </div>
+
           {/* Customer info card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-extrabold text-slate-850 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-2">
-              {isRtl ? "بيانات العميل" : "Customer Details"}
+          <div className="apple-card space-y-4">
+            <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2 flex items-center gap-2">
+              <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5 text-[#0066cc] dark:text-[#2997ff]" />
+              <span>{isRtl ? "بيانات العميل" : "Customer Details"}</span>
             </h3>
 
             {order.customer ? (
-              <div className="space-y-3.5">
+              <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-500 flex-shrink-0">
-                    <User className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center text-[#86868b] flex-shrink-0">
+                    <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-400">{isRtl ? "الاسم" : "Name"}</p>
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{order.customer.name}</p>
+                    <p className="text-xs text-[#86868b]">{isRtl ? "الاسم" : "Name"}</p>
+                    <p className="text-sm font-semibold text-[#1d1d1f] dark:text-white truncate">{order.customer.name}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-500 flex-shrink-0">
-                    <Phone className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center text-[#86868b] flex-shrink-0">
+                    <FontAwesomeIcon icon={faPhone} className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-400">{isRtl ? "الهاتف" : "Phone"}</p>
-                    <a href={`tel:${order.customer.phone}`} className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                    <p className="text-xs text-[#86868b]">{isRtl ? "الهاتف" : "Phone"}</p>
+                    <a href={`tel:${order.customer.phone}`} className="text-sm font-semibold text-[#0066cc] dark:text-[#2997ff] hover:underline">
                       {order.customer.phone || "N/A"}
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-850 flex items-center justify-center text-slate-500 flex-shrink-0">
-                    <Mail className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-[#272729] flex items-center justify-center text-[#86868b] flex-shrink-0">
+                    <FontAwesomeIcon icon={faEnvelope} className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-slate-400">{isRtl ? "البريد الإلكتروني" : "Email"}</p>
-                    <a href={`mailto:${order.customer.email}`} className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline truncate block">
+                    <p className="text-xs text-[#86868b]">{isRtl ? "البريد الإلكتروني" : "Email"}</p>
+                    <a href={`mailto:${order.customer.email}`} className="text-sm font-semibold text-[#0066cc] dark:text-[#2997ff] hover:underline truncate block">
                       {order.customer.email}
                     </a>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">{isRtl ? "عميل مجهول (زائر)" : "Guest Customer"}</p>
+              <p className="text-sm text-[#86868b]">{isRtl ? "عميل زائر (Guest)" : "Guest Customer"}</p>
             )}
           </div>
 
           {/* Shipping Address card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-extrabold text-slate-850 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-2">
-              {isRtl ? "عنوان التوصيل" : "Shipping Address"}
+          <div className="apple-card space-y-4">
+            <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2 flex items-center gap-2">
+              <FontAwesomeIcon icon={faLocationDot} className="w-3.5 h-3.5 text-[#0066cc] dark:text-[#2997ff]" />
+              <span>{isRtl ? "عنوان التوصيل" : "Shipping Address"}</span>
             </h3>
 
             {order.shippingAddress ? (
-              <div className="space-y-3 text-sm text-slate-700 dark:text-slate-350">
-                <div className="flex gap-2">
-                  <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-850 dark:text-white">
-                      {order.shippingAddress.city}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1">
-                      {order.shippingAddress.address}
-                    </p>
-                    <p className="text-[11px] font-bold text-slate-450 uppercase mt-1">
-                      {order.shippingAddress.country}
-                    </p>
-                  </div>
-                </div>
+              <div className="space-y-1.5 text-sm">
+                <p className="font-semibold text-[#1d1d1f] dark:text-white">
+                  {order.shippingAddress.city}
+                </p>
+                <p className="text-xs text-[#86868b]">
+                  {order.shippingAddress.address}
+                </p>
+                <p className="text-[11px] font-semibold text-[#86868b] uppercase">
+                  {order.shippingAddress.country}
+                </p>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">{isRtl ? "لا يوجد عنوان شحن متوفر" : "No shipping address provided"}</p>
+              <p className="text-xs text-[#86868b]">{isRtl ? "لا يوجد عنوان شحن متوفر" : "No shipping address provided"}</p>
             )}
           </div>
 
           {/* Notes card */}
           {order.notes && (
-            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-3">
-              <h3 className="text-sm font-extrabold text-slate-850 dark:text-white border-b border-slate-50 dark:border-slate-800 pb-2">
+            <div className="apple-card space-y-2">
+              <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white border-b border-black/[0.04] dark:border-white/[0.06] pb-2">
                 {isRtl ? "ملاحظات إضافية" : "Additional Notes"}
               </h3>
-              <p className="text-xs text-slate-550 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-850 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <p className="text-xs text-[#86868b] italic bg-[#f5f5f7] dark:bg-[#272729] p-3 rounded-xl">
                 &ldquo;{order.notes}&rdquo;
               </p>
             </div>
