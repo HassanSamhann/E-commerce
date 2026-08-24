@@ -35,8 +35,15 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "demo@shop.com",
+      password: "Demo@12345",
+    },
+  });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -50,6 +57,11 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleFillDemo = () => {
+    setValue("email", "demo@shop.com");
+    setValue("password", "Demo@12345");
   };
 
   return (
@@ -84,9 +96,9 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="merchant@storeflow.com"
+                placeholder="demo@shop.com"
                 {...register("email")}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/[0.4] border border-white/[0.12] text-white text-xs placeholder:text-[#86868b] focus:outline-none focus:border-[#0066cc] transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/[0.4] border border-white/[0.12] text-white text-xs placeholder:text-[#86868b] focus:outline-none focus:border-[#0066cc] transition-colors font-mono"
                 dir="ltr"
               />
               {errors.email && (
@@ -106,7 +118,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   placeholder="••••••••"
                   {...register("password")}
-                  className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-black/[0.4] border border-white/[0.12] text-white text-xs placeholder:text-[#86868b] focus:outline-none focus:border-[#0066cc] transition-colors"
+                  className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-black/[0.4] border border-white/[0.12] text-white text-xs placeholder:text-[#86868b] focus:outline-none focus:border-[#0066cc] transition-colors font-mono"
                 />
                 <button
                   type="button"
@@ -144,11 +156,19 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Demo credentials */}
-        <div className="mt-4 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-center">
-          <p className="text-[11px] text-[#86868b]">
-            Admin Demo: <span className="text-white font-mono">hassan700019@gmail.com</span>
-          </p>
+        {/* Demo credentials box */}
+        <div className="mt-4 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-center flex items-center justify-between px-4">
+          <div className="text-left text-[11px] text-[#86868b]">
+            <div>User: <span className="text-white font-mono">demo@shop.com</span></div>
+            <div className="mt-0.5">Pass: <span className="text-white font-mono">Demo@12345</span></div>
+          </div>
+          <button
+            type="button"
+            onClick={handleFillDemo}
+            className="px-2.5 py-1 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-[10px] font-semibold text-[#2997ff] transition-colors"
+          >
+            Auto-fill
+          </button>
         </div>
       </motion.div>
     </div>

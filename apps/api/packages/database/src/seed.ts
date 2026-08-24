@@ -69,12 +69,24 @@ async function main() {
   const hashedPassword = await bcrypt.hash("Demo@12345", 12);
 
   const demoUser = await prisma.user.upsert({
+    where: { email: "demo@shop.com" },
+    update: {},
+    create: {
+      email: "demo@shop.com",
+      password: hashedPassword,
+      name: "Demo Owner",
+      emailVerified: true,
+    },
+  });
+
+  // Also ensure hassan700019@gmail.com is created
+  await prisma.user.upsert({
     where: { email: "hassan700019@gmail.com" },
     update: {},
     create: {
       email: "hassan700019@gmail.com",
       password: hashedPassword,
-      name: "Demo Owner",
+      name: "Super Admin",
       emailVerified: true,
     },
   });
@@ -86,7 +98,7 @@ async function main() {
       name: "Demo Store",
       slug: "demo-store",
       description: "A demo store to explore the platform",
-      email: "hassan700019@gmail.com",
+      email: "demo@shop.com",
       currency: "EGP",
       country: "EG",
     },
