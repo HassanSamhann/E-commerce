@@ -16,7 +16,6 @@ import {
   faEye,
   faEyeSlash,
   faArrowUpRightFromSquare,
-  faSparkles,
   faStore,
   faUpload,
   faXmark,

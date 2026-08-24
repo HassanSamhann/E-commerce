@@ -9,7 +9,7 @@ import {
   faCrown,
   faCircleNotch,
   faCreditCard,
-  faSparkles,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 const PLAN_ICONS: Record<string, any> = {
   starter: faBolt,
   professional: faCrown,
-  enterprise: faSparkles,
+  enterprise: faWandMagicSparkles,
 };
 
 export default function SubscriptionPage() {
